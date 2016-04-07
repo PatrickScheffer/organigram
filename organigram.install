@@ -1,0 +1,303 @@
+<?php
+/**
+ * @file
+ * Defines the schema for the organigram module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function organigram_schema() {
+  $schema = array();
+  // Entity 'organigram_item' base table.
+  $schema['organigram_item_data'] = array(
+    'description' => 'Base table for the organigram item entity',
+    'fields' => array(
+      'iid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique organigram item ID.',
+      ),
+      'oid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The {organigram}.oid of the organigram to which the term is assigned.',
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The organigram item name.',
+        'translatable' => TRUE,
+      ),
+      'parent' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => "Primary Key: The {organigram_item_data}.iid of the organigram item parent. 0 indicates no parent.",
+      ),
+      'position' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => 'u',
+        'description' => 'The organigram item position.',
+        'translatable' => FALSE,
+      ),
+      'url' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => '',
+        'description' => 'Add a link to this organigram item.',
+        'translatable' => FALSE,
+      ),
+      'border_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => '',
+        'description' => 'Specify the border color of this organigram item.',
+        'translatable' => FALSE,
+      ),
+      'background_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => '',
+        'description' => 'Specify the background color of this organigram item.',
+        'translatable' => FALSE,
+      ),
+      'font_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => '',
+        'description' => 'Specify the font color of this organigram item.',
+        'translatable' => FALSE,
+      ),
+      'bold' => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 0,
+        'description' => 'Boolean indicating whether an extra border should be added to emphasize this organigram item.',
+      ),
+      'image_url' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => '',
+        'description' => 'Specify the alignment of the image for this organigram item.',
+        'translatable' => FALSE,
+      ),
+      'image_alignment' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => '',
+        'description' => 'Specify the URL of an image for this organigram item.',
+        'translatable' => FALSE,
+      ),
+      'weight' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The weight of this organigram item in relation to other organigram items.',
+      ),
+    ),
+    'primary key' => array('iid'),
+    'foreign keys' => array(
+      'organigram' => array(
+        'table' => 'organigram_data',
+        'columns' => array('oid' => 'oid'),
+      ),
+    ),
+    'indexes' => array(
+      'orgranigram_tree' => array('oid', 'name', 'parent', 'weight'),
+      'oid_name' => array('oid', 'name'),
+      'name' => array('name'),
+    ),
+  );
+  // Entity 'organigram' base table.
+  $schema['organigram_data'] = array(
+    'description' => 'Base table for the organigram entity',
+    'fields' => array(
+      'oid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique organigram ID.',
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Name of the organigram.',
+        'translatable' => TRUE,
+      ),
+      'machine_name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The organigram machine name.',
+      ),
+      'description' => array(
+        'type' => 'text',
+        'not null' => FALSE,
+        'size' => 'big',
+        'description' => 'Description of the organigram.',
+        'translatable' => TRUE,
+      ),
+      'canvas_width' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => 'auto',
+        'description' => 'Specify the width in pixels of the organigram.',
+        'translatable' => FALSE,
+      ),
+      'canvas_height' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => 'auto',
+        'description' => 'Specify the height in pixels of the organigram.',
+        'translatable' => FALSE,
+      ),
+      'center' => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 0,
+        'description' => 'Boolean indicating whether the organigram should align on the center of the page.',
+      ),
+      'node_width' => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 120,
+        'description' => 'Specify the width in pixels of the items in this organigram.',
+      ),
+      'node_height' => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 30,
+        'description' => 'Specify the height in pixels of the items in this organigram.',
+      ),
+      'top_radius' => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 0,
+        'description' => 'Specify the radius of the top corners in pixels of the items in this organigram.',
+      ),
+      'bottom_radius' => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 0,
+        'description' => 'Specify the radius of the bottom corners in pixels of the items in this organigram.',
+      ),
+      'shadow_offset' => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 0,
+        'description' => 'Specify the shadow offset in pixels of the items in this organigram.',
+      ),
+      'horizontal_space' => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 20,
+        'description' => 'Specify the horizontal space in pixels between the items in this organigram.',
+      ),
+      'vertical_space' => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 20,
+        'description' => 'Specify the vertical space in pixels between the items in this organigram.',
+      ),
+      'horizontal_offset' => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 30,
+        'description' => 'Specify the horizontal offset in pixels between the l and r items in this organigram.',
+      ),
+      'line_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => '',
+        'description' => 'Specify the connection lines color in this organigram.',
+        'translatable' => FALSE,
+      ),
+      'border_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => '',
+        'description' => 'Specify the border color of the items in this organigram.',
+        'translatable' => FALSE,
+      ),
+      'background_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => '',
+        'description' => 'Specify the background color of the items in this organigram.',
+        'translatable' => FALSE,
+      ),
+      'font_color' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => '',
+        'description' => 'Specify the font color of the items in this organigram item.',
+        'translatable' => FALSE,
+      ),
+      'font_name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => '',
+        'description' => 'Specify the font name of the items in this organigram item.',
+        'translatable' => FALSE,
+      ),
+      'font_size' => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 0,
+        'description' => 'Specify the font size in pixels of the items in this organigram item.',
+      ),
+      'vertical_alignment' => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 1,
+        'description' => 'Specify the vertical text alignment of the items in this organigram item.',
+      ),
+      'module' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The module which created the organigram.',
+      ),
+      'weight' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The weight of this organigram in relation to other organigrams.',
+      ),
+    ),
+    'primary key' => array('oid'),
+    'indexes' => array(
+      'list' => array('weight', 'name'),
+    ),
+    'unique keys' => array(
+      'machine_name' => array('machine_name'),
+    ),
+  );
+  return $schema;
+}

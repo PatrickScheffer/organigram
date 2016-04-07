@@ -1,0 +1,1717 @@
+<?php
+/**
+ * @file
+ * Defines the organigram functions and entity types.
+ */
+
+/**
+ * Implements hook_entity_info().
+ */
+function organigram_entity_info() {
+  $entities = array();
+
+  // Declare the 'organigram_item' entity.
+  $entities['organigram_item'] = array(
+    'label' => t('Organigram item'),
+    'controller class' => 'OrganigramItemController',
+    'base table' => 'organigram_item_data',
+    'fieldable' => TRUE,
+    'entity keys' => array(
+      'id' => 'iid',
+      'bundle' => 'organigram_machine_name',
+      'label' => 'name',
+    ),
+    'bundle keys' => array(
+      'bundle' => 'machine_name',
+    ),
+    'bundles' => array(),
+    'view modes' => array(
+      'organigram' => array(
+        'label' => t('Organigram'),
+        'custom settings' => FALSE,
+      ),
+    ),
+    'module' => 'organigram',
+  );
+
+  // Add all organigram names as bundle to the organigram item.
+  foreach (organigram_get_names() as $machine_name => $organigram) {
+    $entities['organigram_item']['bundles'][$machine_name] = array(
+      'label' => $organigram->name,
+      'admin' => array(
+        'path' => 'admin/structure/organigram/%organigram_machine_name',
+        'real path' => "admin/structure/organigram/{$machine_name}",
+        'bundle argument' => 3,
+        'access callback' => 'organigram_user_access',
+        'access arguments' => array('edit', 3),
+      ),
+    );
+  }
+
+  // Declare the 'organigram' entity.
+  $entities['organigram'] = array(
+    'label' => t('Organigram'),
+    'controller class' => 'OrganigramController',
+    'base table' => 'organigram_data',
+    'entity keys' => array(
+      'id' => 'oid',
+      'label' => 'name',
+    ),
+    'fieldable' => FALSE,
+    'access callback' => 'organigram_entity_access',
+    'module' => 'organigram',
+  );
+
+  return $entities;
+}
+
+/**
+ * Implements hook_entity_property_info().
+ */
+function organigram_entity_property_info() {
+  $info = array();
+  // Add meta-data about the basic organigram item properties.
+  $properties = &$info['organigram_item']['properties'];
+
+  // Organigram item related properties.
+  $properties['iid'] = array(
+    'label' => t('Organigram item ID'),
+    'description' => t('The uniqie ID of the organigram item.'),
+    'type' => 'integer',
+    'schema field' => 'iid',
+  );
+  $properties['name'] = array(
+    'label' => t('Name'),
+    'description' => t('The name of the organigram item.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => TRUE,
+    'schema field' => 'name',
+  );
+  $properties['parent'] = array(
+    'label' => t('Parent item'),
+    'description' => t('The parent terms of the taxonomy term.'),
+    'setter callback' => 'organigram_metadata_organigram_item_setter',
+    'type' => 'organigram_item',
+    'schema field' => 'parent',
+  );
+  $properties['position'] = array(
+    'label' => t('Position'),
+    'description' => t('The position of the organigram item.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => TRUE,
+    'schema field' => 'position',
+  );
+  $properties['url'] = array(
+    'label' => t('URL'),
+    'description' => t('Add a link to this URL to the organigram item.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'url',
+  );
+  $properties['border_color'] = array(
+    'label' => t('Border color'),
+    'description' => t('The border color of the organigram item.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'border_color',
+  );
+  $properties['background_color'] = array(
+    'label' => t('Background color'),
+    'description' => t('The background color of the organigram item.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'background_color',
+  );
+  $properties['font_color'] = array(
+    'label' => t('Font color'),
+    'description' => t('The font color of the organigram item.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'font_color',
+  );
+  $properties['bold'] = array(
+    'label' => t('Bold'),
+    'description' => t('Emphasize the organigram item with an extra border.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'bold',
+  );
+  $properties['image_url'] = array(
+    'label' => t('Image URL'),
+    'description' => t('The image URL of an image to add to the organigram item.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'image_url',
+  );
+  $properties['image_alignment'] = array(
+    'label' => t('Image alignment'),
+    'description' => t('The alignment of the image in the organigram item.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'image_alignment',
+  );
+  $properties['weight'] = array(
+    'label' => t('Weight'),
+    'description' => t('The weight of the organigram item, which is used for ordering items during display.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'schema field' => 'weight',
+  );
+  $properties['organigram'] = array(
+    'label' => t('Organigram'),
+    'description' => t('The organigram the organigram item belongs to.'),
+    'setter callback' => 'organigram_metadata_organigram_item_setter',
+    'type' => 'organigram',
+    'required' => TRUE,
+    'schema field' => 'oid',
+  );
+
+  // Add meta-data about the basic organigram properties.
+  $properties = &$info['organigram']['properties'];
+
+  // Organigram related variables.
+  $properties['oid'] = array(
+    'label' => t('Organigram ID'),
+    'description' => t('The unique ID of the organigram.'),
+    'type' => 'integer',
+    'schema field' => 'oid',
+  );
+  $properties['name'] = array(
+    'label' => t('Name'),
+    'description' => t('The name of the organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => TRUE,
+    'schema field' => 'name',
+  );
+  $properties['machine_name'] = array(
+    'label' => t('Machine name'),
+    'description' => t('The machine name of the organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'type' => 'token',
+    'required' => TRUE,
+    'schema field' => 'machine_name',
+  );
+  $properties['description'] = array(
+    'label' => t('Description'),
+    'description' => t('The optional description of the organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'sanitize' => 'filter_xss',
+    'schema field' => 'description',
+  );
+  $properties['canvas_width'] = array(
+    'label' => t('Canvas width'),
+    'description' => t('Specify the width in pixels of the organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'canvas_width',
+  );
+  $properties['canvas_height'] = array(
+    'label' => t('Canvas height'),
+    'description' => t('Specify the height in pixels of the organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'canvas_height',
+  );
+  $properties['center'] = array(
+    'label' => t('Center'),
+    'description' => t('Boolean indicating whether the organigram should align on the center of the page.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'center',
+  );
+  $properties['node_width'] = array(
+    'label' => t('Node width'),
+    'description' => t('Specify the width in pixels of the items in this organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'node_width',
+  );
+  $properties['node_height'] = array(
+    'label' => t('Node height'),
+    'description' => t('Specify the height in pixels of the items in this organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'node_height',
+  );
+  $properties['top_radius'] = array(
+    'label' => t('Top radius'),
+    'description' => t('Specify the radius of the top corners in pixels of the items in this organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'top_radius',
+  );
+  $properties['bottom_radius'] = array(
+    'label' => t('Bottom radius'),
+    'description' => t('Specify the radius of the bottom corners in pixels of the items in this organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'bottom_radius',
+  );
+  $properties['shadow_offset'] = array(
+    'label' => t('Shadow offset'),
+    'description' => t('Specify the shadow offset in pixels of the items in this organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'shadow_offset',
+  );
+  $properties['horizontal_space'] = array(
+    'label' => t('Horizontal space'),
+    'description' => t('Specify the horizontal space in pixels between the items in this organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'horizontal_space',
+  );
+  $properties['vertical_space'] = array(
+    'label' => t('Vertical space'),
+    'description' => t('Specify the vertical space in pixels between the items in this organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'vertical_space',
+  );
+  $properties['horizontal_offset'] = array(
+    'label' => t('Horizontal offset'),
+    'description' => t('Specify the horizontal offset in pixels between the l and r items in this organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'horizontal_offset',
+  );
+  $properties['line_color'] = array(
+    'label' => t('Line color'),
+    'description' => t('Specify the connection lines color in this organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'line_color',
+  );
+  $properties['border_color'] = array(
+    'label' => t('Border color'),
+    'description' => t('Specify the border color of the items in this organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'border_color',
+  );
+  $properties['background_color'] = array(
+    'label' => t('Background color'),
+    'description' => t('Specify the background color of the items in this organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'background_color',
+  );
+  $properties['font_color'] = array(
+    'label' => t('Font color'),
+    'description' => t('Specify the font color of the items in this organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'font_color',
+  );
+  $properties['font_name'] = array(
+    'label' => t('Font name'),
+    'description' => t('Specify the font name of the items in this organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'font_name',
+  );
+  $properties['font_size'] = array(
+    'label' => t('Font size'),
+    'description' => t('Specify the font size in pixels of the items in this organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'font_size',
+  );
+  $properties['vertical_alignment'] = array(
+    'label' => t('Vertical text alignment'),
+    'description' => t('Specify the vertical text alignment of the items in this organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'vertical_alignment',
+  );
+
+  return $info;
+}
+
+/**
+ * Implements hook_entity_view().
+ */
+function organigram_entity_view($entity, $type, $view_mode, $langcode) {
+  // Only process organigram entities.
+  if ($type == 'organigram') {
+    // Build the organigram.
+    $organigram = organigram_embed_organigram($entity->oid, $langcode);
+    // Remove the name from the organigram which will be provided by the entity
+    // view logic.
+    unset($organigram['name']);
+    // Assign the organigram to the entity.
+    $entity->content = $organigram;
+  }
+}
+
+/**
+ * Implements hook_field_extra_fields().
+ */
+function organigram_field_extra_fields() {
+  $return = array();
+  $info = entity_get_info('organigram_item');
+  foreach (array_keys($info['bundles']) as $bundle) {
+    $return['organigram_item'] = array(
+      $bundle => array(
+        'form' => array(
+          'name' => array(
+            'label' => t('Name'),
+            'description' => t('Organigram item name textfield'),
+            'weight' => -5,
+          ),
+          'parent' => array(
+            'label' => t('Parent item'),
+            'description' => t('Determines the hierarchical structure.'),
+            'weight' => -4,
+          ),
+          'position' => array(
+            'label' => t('Position'),
+            'description' => t('The position below its parent.'),
+            'weight' => -3,
+          ),
+          'weight' => array(
+            'label' => t('Weight'),
+            'description' => t('Determines the order in the hierarchical structure.'),
+            'weight' => -2,
+          ),
+          'options' => array(
+            'label' => t('Options'),
+            'description' => t('Extra options for this item.'),
+            'weight' => -1,
+          ),
+        ),
+      ),
+    );
+  }
+  return $return;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function organigram_block_info() {
+  // Initialize blocks array.
+  $blocks = array();
+  // Iterate through all the available organigrams.
+  foreach (organigram_get_names() as $machine_name => $organigram) {
+    // Add organigram block.
+    $blocks[$organigram->oid] = array(
+      'info' => t('Organigram: !organigram', array(
+        '!organigram' => $organigram->name,
+      )),
+    );
+  }
+  // Return available blocks.
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function organigram_block_view($delta = '') {
+  // Initialize block variable.
+  $block = array('subject' => NULL, 'content' => NULL);
+  // Generate the organigram renderable array.
+  $organigram_renderable_array = organigram_embed_organigram((int) $delta);
+  // Check if generating the organigram was successful.
+  if (is_array($organigram_renderable_array)) {
+    // Render the organigram renderable array and save the content in the block.
+    $block['content'] = drupal_render($organigram_renderable_array);
+  }
+  // Return the rendered organigram block.
+  return $block;
+}
+
+/**
+ * Implements hook_rdf_mapping().
+ */
+function organigram_rdf_mapping() {
+  return array(
+    array(
+      'type' => 'organigram_item',
+      'bundle' => RDF_DEFAULT_BUNDLE,
+      'mapping' => array(
+        'rdftype' => array('skos:Concept'),
+        'name' => array(
+          'predicates' => array('rdfs:label', 'skos:prefLabel'),
+        ),
+        'oid' => array(
+          'predicates' => array('skos:inScheme'),
+          'type' => 'rel',
+        ),
+        'parent' => array(
+          'predicates' => array('skos:broader'),
+          'type' => 'rel',
+        ),
+      ),
+    ),
+    array(
+      'type' => 'organigram',
+      'bundle' => RDF_DEFAULT_BUNDLE,
+      'mapping' => array(
+        'rdftype' => array('skos:ConceptScheme'),
+        'name' => array(
+          'predicates' => array('dc:title'),
+        ),
+        'description' => array(
+          'predicates' => array('rdfs:comment'),
+        ),
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function organigram_menu() {
+  $items = array();
+
+  // Administration pages for organigram.
+  $items['admin/structure/organigram'] = array(
+    'title' => 'Organigram',
+    'description' => 'Create and manage organigrams.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('organigram_form_overview_organigrams'),
+    'access arguments' => array('administer organigram'),
+    'file' => 'organigram.admin.inc',
+  );
+
+  $items['admin/structure/organigram/list'] = array(
+    'title' => 'List organigrams',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+
+  $items['admin/structure/organigram/add'] = array(
+    'title' => 'Add organigram',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('organigram_form_organigram'),
+    'access arguments' => array('administer organigram'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'organigram.admin.inc',
+  );
+
+  $items['admin/structure/organigram/%organigram_machine_name/edit'] = array(
+    'title' => 'Edit organigram',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('organigram_form_organigram', 3),
+    'access arguments' => array('administer organigram'),
+    'file' => 'organigram.admin.inc',
+  );
+
+  $items['admin/structure/organigram/%organigram_machine_name/delete'] = array(
+    'title' => 'Delete organigram',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('organigram_form_confirm_delete_organigram', 3),
+    'access arguments' => array('administer organigram'),
+    'file' => 'organigram.admin.inc',
+  );
+
+  // Administration pages for organigram items.
+  $items['admin/structure/organigram/%organigram_machine_name'] = array(
+    'title callback' => 'organigram_title',
+    'title arguments' => array(3),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('organigram_form_overview_organigram_items', 3),
+    'access callback' => 'organigram_user_access',
+    'access arguments' => array('edit', 3),
+    'file' => 'organigram_item.admin.inc',
+  );
+
+  $items['admin/structure/organigram/%organigram_machine_name/list'] = array(
+    'title' => 'List items',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -20,
+  );
+
+  $items['admin/structure/organigram/%organigram_machine_name/add'] = array(
+    'title' => 'Add organigram item',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('organigram_form_organigram_item', array(), 3),
+    'access callback' => 'organigram_user_access',
+    'access arguments' => array('edit', 3),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'organigram_item.admin.inc',
+  );
+
+  $items['admin/structure/organigram/%/preview'] = array(
+    'title' => 'Preview organigram',
+    'page callback' => 'organigram_preview_page',
+    'page arguments' => array(3),
+    'access callback' => 'organigram_user_access',
+    'access arguments' => array('edit', 3),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => -10,
+    'file' => 'organigram_item.admin.inc',
+  );
+
+  $items['admin/structure/organigram/%organigram_machine_name/item/%organigram_item'] = array(
+    'title callback' => 'organigram_item_title',
+    'title arguments' => array(5),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('organigram_form_organigram_item', 5, 3),
+    'access callback' => 'organigram_user_access',
+    'access arguments' => array('edit', 3),
+    'file' => 'organigram_item.admin.inc',
+  );
+
+  $items['admin/structure/organigram/%organigram_machine_name/item/%organigram_item/edit'] = array(
+    'title' => 'Edit item',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 0,
+  );
+
+  $items['admin/structure/organigram/%/item/%/list'] = array(
+    'title' => 'List items',
+    'page callback' => 'organigram_redirect_to_organigram_item_overview',
+    'page arguments' => array(3),
+    'access callback' => 'organigram_user_access',
+    'access arguments' => array('edit', 3),
+    'file' => 'organigram_item.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => -10,
+  );
+
+  $items['admin/structure/organigram/%organigram_machine_name/item/%organigram_item/delete'] = array(
+    'title' => 'Delete item',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('organigram_form_confirm_delete_organigram_item', 5),
+    'access callback' => 'organigram_user_access',
+    'access arguments' => array('delete', 5),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'organigram_item.admin.inc',
+    'weight' => 10,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+/*function organigram_menu_alter(&$menu_items) {
+  // Only alter field ui menu items for the current organigram admin path if
+  // the module is enabled.
+  if (module_exists('field_ui')) {
+    // Field UI does not understand our menu construction. Therefore it uses the
+    // wrong access arguments and callback. We want to reset these to
+    // 'administer site configuration' and 'user_access'. This needs to be
+    // corrected for every organigram item bundle. Construct the field UI URLs
+    // which need to be replaced.
+    static $field_ui_urls = array(
+      'fields',
+      'fields/%field_ui_menu',
+      'fields/%field_ui_menu/edit',
+      'fields/%field_ui_menu/field-settings',
+      'fields/%field_ui_menu/widget-type',
+      'fields/%field_ui_menu/delete',
+      'display',
+    );
+    // Retrieve organigram item entity information.
+    $organigram_item_info = entity_get_info('organigram_item');
+    // Iterate through the entity bundles.
+    foreach ($organigram_item_info['bundles'] as $bundle_name => $bundle_info) {
+      // Check if the bundle has an admin section.
+      if (isset($bundle_info['admin'])) {
+        // Extract path information from the bundle.
+        $path = $bundle_info['admin']['path'];
+        // Retrieve the bundle argument. (The bunlde argument needs to be casted
+        // to a string to avoid the menu loader from loading the argument).
+        $bundle_arg = (string) isset($bundle_info['admin']['bundle argument']) ? $bundle_info['admin']['bundle argument'] : $bundle_name;
+        // Iterate through the field UI URLs.
+        foreach ($field_ui_urls as $field_ui_url) {
+          // Retrieve the field UI menu item by reference.
+          $field_menu_item = &$menu_items["{$path}/{$field_ui_url}"];
+          // Restore access callback and arguments.
+          $field_menu_item['access callback'] = 'user_access';
+          $field_menu_item['access arguments'] = array(
+            'administer site configuration',
+          );
+        }
+        // Retrieve all the entity view modes.
+        $view_modes = array(
+          'default' => array(
+            'label' => t('Default'),
+          ),
+        ) + $organigram_item_info['view modes'];
+        // Iterate through all the view modes.
+        foreach ($view_modes as $view_mode => $view_mode_info) {
+          // Construct orginal access arguments.
+          $access_arguments = array(
+            'organigram_item',
+            $bundle_arg,
+            $view_mode,
+            'user_access',
+            'administer site configuration',
+          );
+          // Overwrite the access arguments.
+          $menu_items["{$path}/display/{$view_mode}"]['access arguments'] = $access_arguments;
+        }
+      }
+    }
+  }
+}
+*/
+
+/**
+ * Implements hook_permission().
+ */
+function organigram_permission() {
+  // Administer organigram permission.
+  $permissions = array(
+    'administer organigram' => array(
+      'title' => t('Administer organigrams and items'),
+    ),
+  );
+  // Iterate throught the organigrams.
+  foreach (organigram_get_names() as $machine_name => $organigram_info) {
+    // Create the translation arguments.
+    $t_args = array('%organigram' => $organigram_info->name);
+    // Add the edit and delete permission.
+    $permissions['edit organigram ' . $machine_name] = array(
+      'title' => t('Edit organigram and items in %organigram', $t_args),
+    );
+    $permissions['delete organigram ' . $machine_name] = array(
+      'title' => t('Delete organigram items from %organigram', $t_args),
+    );
+  }
+  // Return all permissions.
+  return $permissions;
+}
+
+/**
+ * Implements hook_help().
+ */
+function organigram_help($path, $arg) {
+  switch ($path) {
+    case 'admin/structure/organigram':
+      return '<p>' . t('Organigrams represent a hierarchical layout. Organigram items are grouped into organigrams. The relation between each organigram item represents the hierarchy between these items.') . '</p>';
+  }
+}
+
+/**
+ * Implements hook_library().
+ */
+function organigram_library() {
+  $libraries = array();
+  // Orgchart.
+  $libraries['orgchart'] = array(
+    'title' => 'Orgchart',
+    'version' => '1.14',
+    'js' => array(
+      drupal_get_path('module', 'organigram') . '/libraries/orgchart/orgchart.js' => array(),
+    ),
+    'dependencies' => array(
+      // Require jQuery core.
+      array('system', 'jquery'),
+    ),
+  );
+  return $libraries;
+}
+
+/**
+ * Implements hook_libraries_info().
+ */
+function organigram_libraries_info() {
+  $libraries = array();
+  // Explorer Canvas.
+  $libraries['excanvas'] = array(
+    'name' => 'ExplorerCanvas',
+    'vendor url' => 'https://github.com/arv/explorercanvas',
+    'download url' => 'https://github.com/arv/ExplorerCanvas/archive/aa989ea9d9bac748638f7c66b0fc88e619715da6.zip',
+    'version' => 'aa989ea9d9bac748638f7c66b0fc88e619715da6',
+    'files' => array(
+      'js' => array('excanvas.js'),
+    ),
+  );
+  // Colorpicker.
+  $libraries['colorpicker'] = array(
+    'name' => 'ColorPicker',
+    'vendor url' => 'https://github.com/evoluteur/colorpicker/tree/233e15e4368b0d1eb30f8036a1f5970f09e8ed9e',
+    'download url' => 'https://github.com/evoluteur/colorpicker/archive/233e15e4368b0d1eb30f8036a1f5970f09e8ed9e.zip',
+    'version' => '233e15e4368b0d1eb30f8036a1f5970f09e8ed9e',
+    'files' => array(
+      'js' => array('js/evol-colorpicker.min.js'),
+      'css' => array('css/evol-colorpicker.min.css'),
+    ),
+  );
+  return $libraries;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function organigram_theme() {
+  return array(
+    'organigram_form_overview_organigrams' => array(
+      'render element' => 'form',
+      'file' => 'organigram.theme.inc',
+    ),
+    'organigram_form_overview_organigram_items' => array(
+      'render element' => 'form',
+      'file' => 'organigram.theme.inc',
+    ),
+  );
+}
+
+/*
+ * Menu callback functions.
+ */
+
+/**
+ * Get a value indicating whether the user perform the operation.
+ *
+ * @param string $operation
+ *   An operation to perform on the organigram. Valid values are:
+ *   <ul>
+ *     <li>view</li>
+ *     <li>edit</li>
+ *     <li>delete</li>
+ *   </ul>
+ * @param mixed $object
+ *   An organigram ID, machine name or object on which the operation will be
+ *   performed.
+ *
+ * @return bool
+ *   TRUE if the user has permission to perform the operation, otherwise FALSE.
+ */
+function organigram_user_access($operation, $object, $account = NULL) {
+  static $valid_operations = array('view', 'edit', 'delete');
+  // Check if the user is not an administrator and validate the opertion.
+  if (!($granted = user_access('administer organigram', $account)) && in_array($operation, $valid_operations)) {
+    // If the $organigram argument is a string.
+    if (is_string($object)) {
+      // Then assume its the organigram machine name and try to load the
+      // organigram.
+      $object = organigram_machine_name_load($object);
+    }
+    // If the $organigram argument is a numeric.
+    elseif (is_numeric($object)) {
+      // Then assume its the organigram ID and try to load the organigram.
+      $object = organigram_load($object);
+    }
+    // Check if the operation describes a view operation.
+    if ($operation == 'view') {
+      // Check for the access content access right.
+      $granted = user_access('access content', $account);
+    }
+    else {
+      // Get the machine name.
+      $machine_name = isset($object->machine_name) ? $object->machine_name : $object->organigram_machine_name;
+      // A user which has not the correct permission will be evaluated for a
+      // specific organigram permission. Retrieve a value indicating whether the
+      // current user has permission to perform the specified operation on the
+      // organigram.
+      $granted = user_access("{$operation} organigram {$machine_name}", $account);
+    }
+  }
+  return $granted;
+}
+
+/**
+ * Get the organigram name which can be used as page title.
+ */
+function organigram_title($organigram) {
+  return $organigram->name;
+}
+
+/**
+ * Get the organigram item name which can be used as page title.
+ */
+function organigram_item_title($organigram_item) {
+  return $organigram_item->name;
+}
+
+/*
+ * Entity API callback functions.
+ */
+
+/**
+ * Access callback for the organigram entities.
+ */
+function organigram_entity_access($op, $entity, $account, $entity_type) {
+  // Determine whether the given account has access to the entity for the
+  // specified operation.
+  return organigram_user_access($op, $entity, $account);;
+}
+
+/**
+ * Entity API property setter callback organigram item.
+ */
+function organigram_metadata_organigram_item_setter($organigram_item, $name, $value) {
+  // TODO: Needs be checked if this set the correct data and not an object.
+  // Evalutate the property name.
+  switch ($name) {
+    case 'organigram':
+      // Make sure to also update the organigram bundle key.
+      $organigram = organigram_load($value);
+      $organigram_item->organigram_machine_name = $organigram->machine_name;
+      return $organigram_item->oid = $value;
+    case 'parent':
+      return $organigram_item->parent = $value;
+  }
+}
+
+/*
+ * Module API functions.
+ */
+
+/**
+ * Generate an renderable array for the specified organigram.
+ *
+ * @param mixed $oid
+ *   An organigram ID or organigram machine name.
+ * @param string $langcode
+ *   The language in which the organigram needs to be rendered.
+ *
+ * @return array
+ *   A renderable array for the specified organigram if found, otherwise NULL.
+ */
+function organigram_embed_organigram($oid, $langcode = NULL) {
+  // Initialize organigram renderable array.
+  $organigram_renderable_array = NULL;
+  // Retrieve the organigram by ID or by machine name.
+  if (!is_numeric($oid) && is_string($oid)) {
+    // Load organigram by machine name.
+    $organigram = organigram_machine_name_load($oid);
+    // Retrieve the oid if the organigram is set.
+    if (isset($organigram)) {
+      $oid = $organigram->oid;
+    }
+  }
+  else {
+    // Load the organigram by ID.
+    $organigram = organigram_load($oid);
+  }
+
+  // Validate loaded organigram.
+  if ($organigram) {
+    // Contruct the orgchart settings.
+    $table_data = array(
+      'organigram_settings' => (object) array(
+        'canvas_width'       => $organigram->canvas_width,
+        'canvas_height'      => $organigram->canvas_height,
+        'center'             => $organigram->center,
+        'node_width'         => $organigram->node_width,
+        'node_height'        => $organigram->node_height,
+        'top_radius'         => $organigram->top_radius,
+        'bottom_radius'      => $organigram->bottom_radius,
+        'shadow_offset'      => $organigram->shadow_offset,
+        'horizontal_space'   => $organigram->horizontal_space,
+        'vertical_space'     => $organigram->vertical_space,
+        'horizontal_offset'  => $organigram->horizontal_offset,
+        'line_color'         => $organigram->line_color,
+        'border_color'       => $organigram->border_color,
+        'background_color'   => $organigram->background_color,
+        'font_color'         => $organigram->font_color,
+        'font_name'          => $organigram->font_name,
+        'font_size'          => $organigram->font_size,
+        'vertical_alignment' => $organigram->vertical_alignment,
+      ),
+      'nodes' => array(),
+    );
+
+    // Generate a unique ID for the current embed request.
+    // A unique ID is needed to prevent collisions between multiple organigrams
+    // on one page.
+    $organigram_id = drupal_hash_base64(uniqid(mt_rand(), TRUE) . mt_rand());
+
+    // Construct the organigram renderable array.
+    $organigram_renderable_array = array(
+      '#prefix' => '<div class="organigram organigram-' . $oid . '">',
+      '#suffix' => '</div>',
+      'name' => array('#markup' => '<h2>' . check_plain($organigram->name) . '</h2>'),
+      'description_wrapper' => array(
+        '#type' => 'container',
+        '#attributes' => array('class' => 'description'),
+        'description' => array('#markup' => '<p>' . check_plain($organigram->description) . '</p>'),
+      ),
+      'organigram_items' => array(
+        '#type' => 'container',
+        '#attributes' => array('id' => "organigram-items-{$organigram_id}", 'class' => 'organigram-items'),
+      ),
+    );
+    // Retrieve the organigram items by reference.
+    $organigram_items_renderable_array = &$organigram_renderable_array['organigram_items'];
+
+    // Retrieve the organigram tree.
+    $organigram_tree = organigram_get_tree($oid, 0, NULL, TRUE);
+    // Iterate through the organigram tree.
+    foreach ($organigram_tree as $tree_item) {
+      // Construct organigram item ID.
+      $organigram_item_id = "{$organigram_id}-{$tree_item->iid}";
+
+      // Construct organigram item row and add it to the rows array.
+      $table_data['nodes'][] = (object) array(
+        'id'               => $tree_item->iid,
+        'parent'           => empty($tree_item->parent) ? '' : $tree_item->parent,
+        'position'         => $tree_item->position,
+        'text'             => decode_entities(check_plain($tree_item->name)),
+        'bold'             => $tree_item->bold,
+        'url'              => $tree_item->url,
+        'border_color'     => $tree_item->border_color,
+        'background_color' => $tree_item->background_color,
+        'font_color'       => $tree_item->font_color,
+        'image_url'        => $tree_item->image_url,
+        'image_alignment'  => $tree_item->image_alignment,
+      );
+
+      // Render the organigram item for non-javascript support.
+      $organigram_item_view = entity_view('organigram_item', array($tree_item), 'organigram', $langcode);
+      // Retrieve the organigram item view.
+      $organigram_item_view = $organigram_item_view['organigram_item'][$tree_item->iid];
+      // Add wrapper div needed to locate the content for the BeautyTips.
+      $organigram_item_view['#prefix'] = '<div id="organigram-item-wrapper-' . $organigram_item_id . '" class="organigram-item-wrapper">';
+      $organigram_item_view['#suffix'] = '</div>';
+      // Add the rendered organigram item to the organigram items render array.
+      $organigram_items_renderable_array[$tree_item->iid] = $organigram_item_view;
+    }
+
+    // Only add javascript if the organigram contains organigram items.
+    if (!empty($organigram_tree)) {
+      // Include the excanvas library if it exists.
+      libraries_load('excanvas');
+      // Include the orgchart library.
+      drupal_add_library('organigram', 'orgchart');
+      // Include the Organigram content loader.
+      drupal_add_js(drupal_get_path('module', 'organigram') . '/js/organigram.js');
+      // Add the organigram to the organigrams list.
+      drupal_add_js(array('organigram' => array('organigrams' => array($organigram_id => $table_data))), 'setting');
+    }
+  }
+  // Return the organigram renderable array.
+  return $organigram_renderable_array;
+}
+
+/**
+ * Get a list the organigram names.
+ *
+ * @return array
+ *   An array of organigram ids, names and machine names, keyed by machine name.
+ */
+function organigram_get_names() {
+  // Retrieve all organigrams.
+  $names = db_query('SELECT name, machine_name, oid FROM {organigram_data}')->fetchAllAssoc('machine_name');
+  // Return the organigrams.
+  return $names;
+}
+
+/**
+ * Get a list of organigram objects.
+ *
+ * @return array
+ *   An array of organigram objects, keyed by the organigram ID.
+ */
+function organigram_get_organigrams() {
+  // Load all organigram objects and return the list.
+  return organigram_load_multiple(FALSE, array());
+}
+
+/**
+ * Create a hierarchical representation of an organigram.
+ *
+ * @param int $oid
+ *   An organigram ID.
+ * @param int $parent
+ *   An organigram item ID under which to generate the tree. If 0, generate the
+ *   tree for the entire organigram.
+ * @param int $max_depth
+ *   The number of levels of the tree to return. Leave NULL to return all
+ *   levels.
+ * @param bool $load_entities
+ *   If TRUE, a full entity load will occur on the organigram item objects.
+ *   Otherwise they are partial objects queried directly from the
+ *   {organigram_item_data} table to save execution time and memory consumption
+ *   when listing large numbers of organigram items. Defaults to FALSE.
+ *
+ * @return array
+ *   An array of all organigram item objects in the tree. Each organigram item
+ *   object is extended to have "depth" attribute in addition to its normal
+ *   ones. Results are staticallay cached. Organigram item objects will be
+ *   partial or complete depending on the $load_entities parameter.
+ */
+function organigram_get_tree($oid, $parent = 0, $max_depth = NULL, $load_entities = FALSE) {
+  // Retrieve the static cache.
+  $children = &drupal_static(__FUNCTION__, array());
+  $parents = &drupal_static(__FUNCTION__ . ':parents', array());
+  $organigram_items = &drupal_static(__FUNCTION__ . ':organigram_items', array());
+  // Check if the oid is cached.
+  if (!isset($children[$oid])) {
+    // Initialize the arrays for the given oid.
+    $children[$oid] = array();
+    $parents[$oid] = array();
+    $organigram_items[$oid] = array();
+    // Construct hierarchy query.
+    $query = db_select('organigram_item_data', 'oid');
+    $result = $query
+      ->addTag('translatable')
+      ->addTag('organigram_item_access')
+      ->fields('oid')
+      ->condition('oid.oid', $oid)
+      ->orderBy('oid.weight')
+      ->orderBy('oid.name')
+      ->execute();
+    // Iterate through the result set.
+    foreach ($result as $organigram_item) {
+      // If no array is initialized then initialize.
+      if (($organigram_item_children = &$children[$oid][$organigram_item->parent]) === NULL) {
+        $organigram_item_children = array();
+      }
+      // If not initialized then initialize.
+      if (($organigram_item_parents = &$parents[$oid][$organigram_item->iid]) === NULL) {
+        $organigram_item_parents = array();
+      }
+      // Add the hierarchy.
+      $organigram_item_children[] = $organigram_item->iid;
+      $organigram_item_parents[] = $organigram_item->parent;
+      $organigram_items[$oid][$organigram_item->iid] = $organigram_item;
+    }
+  }
+  // Load full entities, if necessary. The entity controller statically caches
+  // the results.
+  if ($load_entities) {
+    $organigram_item_entities = organigram_item_load_multiple(array_keys($organigram_items[$oid]));
+  }
+  // Determine the max depth.
+  $max_depth = (isset($max_depth) ? $max_depth : count($children[$oid]));
+  // Initialize the tree.
+  $tree = array();
+  // Keeps track of the parents we have to process, the last entry is used for
+  // the next processing step.
+  $process_parents = array($parent);
+  // Loop over the parents.
+  while (count($process_parents)) {
+    // Pop a parent from the parents list.
+    $parent = array_pop($process_parents);
+    // The number of parents determines the current depth.
+    $depth = count($process_parents);
+    // Check if the current depth is not passed the max depth.
+    if ($max_depth > $depth && !empty($children[$oid][$parent])) {
+      $has_children = FALSE;
+      $child = current($children[$oid][$parent]);
+      do {
+        if (empty($child)) {
+          break;
+        }
+        // Retrieve the organigram item. This can be an queried entity or a full
+        // loaded entity depending on the load_entities value.
+        $organigram_item = ($load_entities ? $organigram_item_entities[$child] : $organigram_items[$oid][$child]);
+        // Add the depth as a property.
+        $organigram_item->depth = $depth;
+        // Add the organigram item to the tree.
+        $tree[] = $organigram_item;
+        // Check if the organigram item has children.
+        if (!empty($children[$oid][$organigram_item->iid])) {
+          // Indicate that new children were found.
+          $has_children = TRUE;
+          // We have to continue with this parent later.
+          $process_parents[] = $parent;
+          // Use the current organigram item as parent for the next iteration.
+          $process_parents[] = $organigram_item->iid;
+          // Reset pointers for child lists.
+          reset($children[$oid][$organigram_item->iid]);
+          // Move pointer so that we get the current organigram item the next
+          // time.
+          next($children[$oid][$parent]);
+          break;
+        }
+      } while ($child = next($children[$oid][$parent]));
+      // Check if the current iteration resulted in new children.
+      if (!$has_children) {
+        // We processed all terms in this hierarchy-level, reset pointer
+        // so that this function works the next time it gets called.
+        reset($children[$oid][$parent]);
+      }
+    }
+  }
+  // Return the constructed tree.
+  return $tree;
+}
+
+/**
+ * Get an organigram object matching a organigram machine name.
+ *
+ * @param string $name
+ *   An organigram machine name.
+ *
+ * @return mixed
+ *   An organigram object with all of its metadata if exists, otherwise FALSE.
+ *   Results are statically cached.
+ */
+function organigram_machine_name_load($name) {
+  // Retrieve the organigrams containing the name.
+  $organigrams = organigram_load_multiple(FALSE, array('machine_name' => $name));
+  // Return the first entry.
+  return reset($organigrams);
+}
+
+/**
+ * Try to map a string to an existing organigram item, as for glossary use.
+ *
+ * @param string $name
+ *   An organigram item name to search for.
+ *
+ * @return array
+ *   An array of matching organigram item objects.
+ */
+function organigram_get_item_by_name($name) {
+  return organigram_item_load_multiple(FALSE, array('name' => trim($name)));
+}
+
+/**
+ * Get an organigram object matching the organigram ID.
+ *
+ * @param int $oid
+ *   An organigram ID.
+ *
+ * @return object
+ *   An organigram object if exists, otherwise FALSE. Results are statically
+ *   cache.
+ */
+function organigram_load($oid) {
+  // Initialize the organigram to FALSE.
+  $organigram = FALSE;
+  // Validate oid argument.
+  if (is_numeric($oid)) {
+    // Load the organigram.
+    $organigrams = organigram_load_multiple(array($oid), array());
+    // Assign the first entry to organigrams.
+    $organigram = reset($organigrams);
+  }
+  // Return the organigram.
+  return $organigram;
+}
+
+/**
+ * Get an organigram item object matching the organigram item ID.
+ *
+ * @param int $iid
+ *   An organigram item ID.
+ *
+ * @return object
+ *   An organigram item object if exists, otherwise FALSE. Results are
+ *   statically cached.
+ */
+function organigram_item_load($iid) {
+  // Initialize the organigram item to FALSE.
+  $organigram_item = FALSE;
+  // Validate iid argument.
+  if (is_numeric($iid)) {
+    // Load the organigram item.
+    $organigram_items = organigram_item_load_multiple(array($iid), array());
+    // Assign the first entry to organigram_item.
+    $organigram_item = reset($organigram_items);
+  }
+  // Return the organigram item.
+  return $organigram_item;
+}
+
+/**
+ * Load multiple organigrams based on certain conditions.
+ *
+ * This function should be used whenever you need to load more than one
+ * organigram from the databse. Organigrams are loaded into memory and will not
+ * require database access if loaded again during the same page request.
+ *
+ * @param array $oids
+ *   An array of organigram IDs.
+ * @param array $conditions
+ *   (deprecated) An associative array of conditions on the {organigram} table,
+ *   where the keys are the database fields and the values are the values those
+ *   fields must have. Instead, it is preferable to use EntityFieldQuery to
+ *   retrieve a list of entity IDs loadable by this function.
+ *
+ * @return array
+ *   An array of organigram objects, keyed by oid.
+ *
+ * @see entity_load()
+ * @see EntityFieldQuery
+ *
+ * @todo Remove $conditions in Drupal 8.
+ */
+function organigram_load_multiple($oids = array(), $conditions = array()) {
+  // Retrieve an array of organigram objects using the specified conditions and
+  // return the result.
+  return entity_load('organigram', $oids, $conditions);
+}
+
+/**
+ * Load multiple organigram items based on certain conditions.
+ *
+ * This function should be used whenever you need to load more than one
+ * organigram item from the databse. Organigram items are loaded into memory and
+ * will not require database access if loaded again during the same page
+ * request.
+ *
+ * @param array $iids
+ *   An array of organigram item IDs.
+ * @param array $conditions
+ *   (deprecated) An associative array of conditions on the
+ *   {organigram_item_data} table, where the keys are the database fields and
+ *   the values are the values those fields must have. Instead, it is preferable
+ *   to use EntityFieldQuery to retrieve a list of entity IDs loadable by this
+ *   function.
+ *
+ * @return array
+ *   An array of organigram item objects, indexed by iid.
+ *
+ * @see entity_load()
+ * @see EntityFieldQuery
+ *
+ * @todo Remove $conditions in Drupal 8.
+ */
+function organigram_item_load_multiple($iids = array(), $conditions = array()) {
+  // Retrieve an array of organigram item objects using the specified conditions
+  // and return the result.
+  return entity_load('organigram_item', $iids, $conditions);
+}
+
+/**
+ * Save an organigram given an organigram object.
+ *
+ * @param object $organigram
+ *   An organigram object.
+ *
+ * @return int
+ *   The SAVED_NEW or SAVED_UPDATED if successful, otherwise NULL.
+ */
+function organigram_save($organigram) {
+  // Prevent leading and trailing spaces in organigram names.
+  $organigram->name = trim($organigram->name);
+  // Load the stored entity, if any.
+  if (!empty($organigram->oid)) {
+    // If the original property is not set.
+    if (!isset($organigram->original)) {
+      // Load an unchanged organigram object.
+      $organigram->original = entity_load_unchanged('organigram', $organigram->oid);
+    }
+    $organigram->old_machine_name = $organigram->original->machine_name;
+  }
+  // If the module property is missing.
+  if (!isset($organigram->module)) {
+    // Then use the 'organigram' as creator module.
+    $organigram->module = 'organigram';
+  }
+  // Allow modules to perform modifications to the organigram.
+  module_invoke_all('organigram_presave', $organigram);
+  module_invoke_all('entity_presave', $organigram, 'organigram');
+  // Initialize the status variable.
+  $status = NULL;
+  // If the oid and name is not empty.
+  if (!empty($organigram->oid) && !empty($organigram->name)) {
+    // Write the organigram to the DB.
+    $status = drupal_write_record('organigram_data', $organigram, 'oid');
+    // If the organigram machine name changed.
+    if ($organigram->old_machine_name != $organigram->machine_name) {
+      // Rename the field bundle.
+      field_attach_rename_bundle('organigram_item', $organigram->old_machine_name, $organigram->machine_name);
+    }
+    // Allow modules to perform action on update.
+    module_invoke_all('organigram_update', $organigram);
+    module_invoke_all('entity_update', $organigram, 'organigram');
+  }
+  elseif (empty($organigram->oid)) {
+    // Write the organigram to the DB.
+    $status = drupal_write_record('organigram_data', $organigram);
+    // Attach the field bundle.
+    field_attach_create_bundle('organigram_item', $organigram->machine_name);
+    // Allow modules to perform action on insert.
+    module_invoke_all('organigram_insert', $organigram);
+    module_invoke_all('entity_insert', $organigram, 'organigram');
+  }
+  // Remove the original and old_machine_name property.
+  unset($organigram->original);
+  unset($organigram->old_machine_name);
+  // Clear cache.
+  cache_clear_all();
+  // Request entity cache reset for the given oid.
+  entity_get_controller('organigram')->resetCache(array($organigram->oid));
+  // Return the operation status.
+  return $status;
+}
+
+/**
+ * Save an organigram item given an organigram item object.
+ *
+ * @param object $organigram_item
+ *   An organigram item object.
+ *
+ * @return int
+ *   The SAVED_NEW or SAVED_UPDATED if successful, otherwise NULL.
+ */
+function organigram_item_save($organigram_item) {
+  // Prevent leading and trailing spaces in the organigram item name.
+  $organigram_item->name = trim($organigram_item->name);
+  // If the organigram machine name is not set, then load the organigram and
+  // assign the machine name.
+  if (!isset($organigram_item->organigram_machine_name)) {
+    // Load the organigram using the organigram ID.
+    $organigram = organigram_item_load($organigram_item->oid);
+    // Assign the organigram_machine_name property to the organigram item.
+    $organigram_item->organigram_machine_name = $organigram->machine_name;
+  }
+  // Load the stored entity, if any.
+  if (!empty($organigram_item->iid) && !isset($organigram_item->original)) {
+    // Load the unchanged entity object.
+    $organigram_item->original = entity_load_unchanged('organigram_item', $organigram_item->iid);
+  }
+  // Allow modules to perform logic on presave.
+  field_attach_presave('organigram_item', $organigram_item);
+  module_invoke_all('organigram_item_presave', $organigram_item);
+  module_invoke_all('entity_presave', $organigram_item, 'organigram_item');
+  // Perform insert is no iid iset.
+  if (empty($organigram_item->iid)) {
+    // Save operation (used for hooks).
+    $op = 'insert';
+    // Write organigram item to DB.
+    $status = drupal_write_record('organigram_item_data', $organigram_item);
+    field_attach_insert('organigram_item', $organigram_item);
+  }
+  else {
+    // Save operation (used for hooks).
+    $op = 'update';
+    // Write organigram item to DB.
+    $status = drupal_write_record('organigram_item_data', $organigram_item, 'iid');
+    field_attach_update('organigram_item', $organigram_item);
+  }
+  // Reset the organigram item cache.
+  organigram_items_static_reset();
+  // Allow modules to react upon insert or update.
+  module_invoke_all("organigram_item_{$op}", $organigram_item);
+  module_invoke_all("entity_{$op}", $organigram_item, 'organigram_item');
+  // Remove the original property.
+  unset($organigram_item->original);
+  // Return the operation status.
+  return $status;
+}
+
+/**
+ * Delete an organigram given the organigram ID.
+ *
+ * @return int
+ *   The SAVED_DELETED if successful, otherwise NULL.
+ */
+function organigram_delete($oid) {
+  // Retrieve the organigram object.
+  $organigram = organigram_load($oid);
+  // Start a transation.
+  $transaction = db_transaction();
+  try {
+    // Retrieve all the organigram items assigned to the current organigram.
+    $result = db_query('SELECT iid FROM {organigram_item_data} WHERE oid = :oid', array(':oid' => $oid))->fetchCol();
+    // Iterate through the result set.
+    foreach ($result as $iid) {
+      // Remove the organigram item.
+      organigram_item_delete($iid);
+    }
+    // Create delete statement.
+    db_delete('organigram_data')
+      ->condition('oid', $oid)
+      ->execute();
+    // Remove the field bundle.
+    field_attach_delete_bundle('organigram_item', $organigram->machine_name);
+    // Allow modules to perform actions after deletion.
+    module_invoke_all('organigram_delete', $organigram);
+    module_invoke_all('entity_delete', $organigram, 'organigram');
+    // Clear cache.
+    cache_clear_all();
+    // Request entity cache reset for the given oid.
+    entity_get_controller('organigram')->resetCache();
+    // Return status deleted.
+    return SAVED_DELETED;
+  }
+  catch (Exception $ex) {
+    // Rollback DB modifications.
+    $transaction->rollback();
+    // Log to watchdog.
+    watchdog_exception('organigram', $ex);
+    // Rethrow the exception.
+    throw $ex;
+  }
+}
+
+/**
+ * Delete an organigram item.
+ *
+ * @param int $iid
+ *   An organigram item.
+ */
+function organigram_item_delete($iid) {
+  // Start a transaction.
+  $transaction = db_transaction();
+  try {
+    // Create iid collection.
+    $iids = array($iid);
+    while (!empty($iids)) {
+      // Initialize orphans list.
+      $orphans = array();
+      // Iterate through the iids.
+      foreach ($iids as $iid) {
+        // Retrieve children for the current iid.
+        $orphans = array_keys(organigram_item_get_children($iid));
+        // Check if the organigram item exists.
+        if (($organigram_item = organigram_item_load($iid)) !== NULL) {
+          // Remove the organigram item.
+          db_delete('organigram_item_data')
+            ->condition('iid', $iid)
+            ->execute();
+          // Remove the bundled data for the specified entity.
+          field_attach_delete('organigram_item', $organigram_item);
+          // Allow modules to act upon the delete action.
+          module_invoke_all('organigram_item_delete', $organigram_item);
+          module_invoke_all('entity_delete', $organigram_item, 'organigram_item');
+          // Reset the organigram item cache.
+          organigram_items_static_reset();
+        }
+      }
+      // Assign the orphans list to the iids list.
+      $iids = $orphans;
+    }
+  }
+  catch (Exception $ex) {
+    // Undo DB changes.
+    $transaction->rollback();
+    // Log exception.
+    watchdog_exception('organigram', $ex);
+    // Rethrow the exception.
+    throw $ex;
+  }
+}
+
+/**
+ * Finds all children of an organigram item ID.
+ *
+ * @param int $iid
+ *   An organigram item ID.
+ *
+ * @return array
+ *   An array of organigram item objects which are the children of the
+ *   organigram item.
+ */
+function organigram_item_get_children($iid) {
+  // Retrieve static cache.
+  $children = &drupal_static(__FUNCTION__, array());
+  // Validate iid argument and check if the static cache has an entry.
+  if ($iid && !isset($children[$iid])) {
+    // Retrieve organigram item children.
+    $query = db_select('organigram_item_data', 'oid');
+    $query->addTag('organigram_item_access');
+    $query->addField('oid', 'iid');
+    $query->condition('oid.parent', $iid);
+    $query->orderBy('oid.weight');
+    $query->orderBy('oid.name');
+    $iids = $query->execute()->fetchCol();
+    // Load the full object for each organigram item and save to static cache.
+    $children[$iid] = organigram_item_load_multiple($iids);
+  }
+  // Return the static cached version.
+  return isset($children[$iid]) ? $children[$iid] : array();
+}
+
+/**
+ * Find parent of a given organigram item ID.
+ *
+ * @param int $iid
+ *   An organigram item ID.
+ *
+ * @return mixed
+ *   An organigram item object if the parent exists, otherwise NULL.
+ */
+function organigram_item_get_parent($iid) {
+  $parent_organigram_item = NULL;
+  // Try to load the organigram item and check if the parent contains a value.
+  // (Remember 0 is no parent).
+  if (($organigram_item = organigram_item_load($iid)) !== NULL && !empty($organigram_item->parent)) {
+    // Try to load the organigram item parent.
+    $parent_organigram_item = organigram_item_load($organigram_item->parent);
+  }
+  return $parent_organigram_item;
+}
+
+/**
+ * Find all ancestors of the given organigram item ID.
+ *
+ * @param int $iid
+ *   An organigram item ID.
+ *
+ * @return array
+ *   An associative array of organigram item IDs representing the parents.
+ */
+function organigram_item_get_ancestors($iid) {
+  // Retrieve ancestors cache.
+  $ancestors = &drupal_static(__FUNCTION__, array());
+  // Try to load the organigram item and check if the parent contains a value.
+  // (Remember 0 is no parent).
+  if (($organigram_item = organigram_item_load($iid)) !== NULL && !empty($organigram_item->parent)) {
+    // Add the current organigramn item to the parents list.
+    $parents = array($organigram_item);
+    // Initialize the index variable.
+    $i = 0;
+    // Loop in the parents.
+    while ($parent = organigram_item_get_parent($parents[$i]->iid)) {
+      // Add parent to the parents array.
+      $parents[] = $parent;
+      // Increment the index.
+      $i++;
+    }
+    // Cache the parents array.
+    $ancestors[$iid] = $parents;
+  }
+  return isset($ancestors[$iid]) ? $ancestors[$iid] : array();
+}
+
+/**
+ * Generate a list of suitable parents for the given organigram item.
+ *
+ * This function is suitable for selection form elements.
+ *
+ * @param int $iid
+ *   An organigram item ID.
+ * @param int $oid
+ *   An organigram ID.
+ *
+ * @return array
+ *   An associative array of parents, keyed by the organigram item ID and the
+ *   name as value.
+ */
+function organigram_item_get_suitable_parents_options($iid, $oid) {
+  // Initialize the parent relation options.
+  $parent_relation_options = array();
+  // Retrieve parent.
+  $parents = array_keys(organigram_item_get_ancestors($iid));
+  // Retrieve the children.
+  $children = organigram_get_tree($oid, $iid);
+  // Construct excluded iids.
+  $excluded_iids = array();
+  foreach ($children as $child) {
+    $excluded_iids[] = $child->iid;
+  }
+  $excluded_iids[] = $iid;
+  // Iterate through the organigram tree.
+  foreach (organigram_get_tree($oid) as $tree_item) {
+    // Do not allow the excluded iids as parent.
+    if (!in_array($tree_item->iid, $excluded_iids)) {
+      // Add organigram item name to the parent options.
+      $parent_relation_options[$tree_item->iid] = str_repeat('-', $tree_item->depth) . filter_xss_admin($tree_item->name);
+    }
+  }
+  // Return the suitable parent options.
+  return $parent_relation_options;
+}
+
+/**
+ * Clear all static cache variables for organigram items.
+ */
+function organigram_items_static_reset() {
+  drupal_static_reset('organigram_item_get_ancestors');
+  drupal_static_reset('organigram_item_get_children');
+  drupal_static_reset('organigram_get_tree');
+  drupal_static_reset('organigram_get_tree:parents');
+  drupal_static_reset('organigram_get_tree:organigram_items');
+}
+
+/*
+ * Controller classes for the declared entities.
+ */
+
+/**
+ * Controller class for organigrams.
+ *
+ * This extends the DrupalDefaultEntityController class, adding required
+ * special handling for organigram objects.
+ */
+class OrganigramController extends EntityAPIController {
+
+  /**
+   * Builds the query to load the entity.
+   *
+   * @param array $ids
+   *   An array of entity IDs, or FALSE to load all entities.
+   * @param array $conditions
+   *   An array of conditions in the form 'field' => $value.
+   * @param mixed $revision_id
+   *   The ID of the revision to load, or FALSE if this query is asking for the
+   *   most current revision(s).
+   *
+   * @return SelectQuery
+   *   A SelectQuery object for loading the entity.
+   */
+  protected function buildQuery($ids, $conditions = array(), $revision_id = FALSE) {
+    $query = parent::buildQuery($ids, $conditions, $revision_id);
+    $query->addTag('translatable');
+    $query->orderBy('base.weight');
+    $query->orderBy('base.name');
+    return $query;
+  }
+
+}
+
+/**
+ * Controller class for organigram items.
+ *
+ * This extends the DrupalDefaultEntityController class. Only alternation is
+ * that we match the condition on organigram item name case-independently.
+ */
+class OrganigramItemController extends EntityAPIController {
+
+  /**
+   * Builds the query to load the entity.
+   *
+   * @param array $ids
+   *   An array of entity IDs, or FALSE to load all entities.
+   * @param array $conditions
+   *   An array of conditions in the form 'field' => $value.
+   * @param mixed $revision_id
+   *   The ID of the revision to load, or FALSE if this query is asking for the
+   *   most current revision(s).
+   *
+   * @return SelectQuery
+   *   A SelectQuery object for loading the entity.
+   */
+  protected function buildQuery($ids, $conditions = array(), $revision_id = FALSE) {
+    $query = parent::buildQuery($ids, $conditions, $revision_id);
+    $query->addTag('translatable');
+    $query->addTag('organigram_item_access');
+    // When name is passed as a condition use LIKE.
+    if (isset($conditions['name'])) {
+      $query_conditions = &$query->conditions();
+      foreach ($query_conditions as $key => $condition) {
+        if ($condition['field'] == 'base.name') {
+          $query_conditions[$key]['operator'] = 'LIKE';
+          $query_conditions[$key]['value'] = db_like($query_conditions[$key]['value']);
+        }
+      }
+    }
+    // Add the machine name field from the {organigram} table.
+    $query->innerJoin('organigram_data', 'o', 'base.oid = o.oid');
+    $query->addField('o', 'machine_name', 'organigram_machine_name');
+    return $query;
+  }
+
+  /**
+   * Gets entities from the static cache.
+   *
+   * @param array $ids
+   *   If not empty, return entities that match these IDs.
+   * @param array $conditions
+   *   If set, return entities that match all of these conditions.
+   *
+   * @return array
+   *   Array of entities from the entity cache.
+   */
+  protected function cacheGet($ids, $conditions = array()) {
+    $organigram_items = parent::cacheGet($ids, $conditions);
+    // Name matching is case insensitive, note that with some collations
+    // LOWER() and drupal_strtolower() may return different results.
+    foreach ($organigram_items as $organigram_item) {
+      // Convert organigram item to an array.
+      $organigram_item_values = (array) $organigram_item;
+      // Remove any mismatching names.
+      if (isset($conditions['name']) && drupal_strtolower($conditions['name'] != drupal_strtolower($organigram_item_values['name']))) {
+        // Remove the organigram item.
+        unset($organigram_items[$organigram_item->iid]);
+      }
+    }
+    return $organigram_items;
+  }
+}

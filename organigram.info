@@ -1,0 +1,11 @@
+name = Organigram
+description = Create and manage organigrams.
+package = Organigram
+core = 7.x
+
+; Module dependencies.
+dependencies[] = entity
+dependencies[] = libraries
+
+; Autoload support the entity controllers.
+files[] = organigram.module
