@@ -15,7 +15,7 @@ function organigram_entity_info() {
     'label' => t('Organigram item'),
     'controller class' => 'OrganigramItemController',
     'base table' => 'organigram_item_data',
-    'fieldable' => TRUE,
+    'fieldable' => FALSE,
     'entity keys' => array(
       'id' => 'iid',
       'bundle' => 'organigram_machine_name',
@@ -25,12 +25,6 @@ function organigram_entity_info() {
       'bundle' => 'machine_name',
     ),
     'bundles' => array(),
-    'view modes' => array(
-      'organigram' => array(
-        'label' => t('Organigram'),
-        'custom settings' => FALSE,
-      ),
-    ),
     'module' => 'organigram',
   );
 
@@ -57,7 +51,13 @@ function organigram_entity_info() {
       'id' => 'oid',
       'label' => 'name',
     ),
-    'fieldable' => FALSE,
+    'fieldable' => TRUE,
+    'view modes' => array(
+      'organigram_block' => array(
+        'label' => t('Organigram block'),
+        'custom settings' => FALSE,
+      ),
+    ),
     'access callback' => 'organigram_entity_access',
     'module' => 'organigram',
   );
@@ -348,35 +348,15 @@ function organigram_entity_view($entity, $type, $view_mode, $langcode) {
  */
 function organigram_field_extra_fields() {
   $return = array();
-  $info = entity_get_info('organigram_item');
+  $info = entity_get_info('organigram');
   foreach (array_keys($info['bundles']) as $bundle) {
-    $return['organigram_item'] = array(
+    $return['organigram'] = array(
       $bundle => array(
         'form' => array(
           'name' => array(
             'label' => t('Name'),
-            'description' => t('Organigram item name textfield'),
+            'description' => t('Organigram name textfield'),
             'weight' => -5,
-          ),
-          'parent' => array(
-            'label' => t('Parent item'),
-            'description' => t('Determines the hierarchical structure.'),
-            'weight' => -4,
-          ),
-          'position' => array(
-            'label' => t('Position'),
-            'description' => t('The position below its parent.'),
-            'weight' => -3,
-          ),
-          'weight' => array(
-            'label' => t('Weight'),
-            'description' => t('Determines the order in the hierarchical structure.'),
-            'weight' => -2,
-          ),
-          'options' => array(
-            'label' => t('Options'),
-            'description' => t('Extra options for this item.'),
-            'weight' => -1,
           ),
         ),
       ),

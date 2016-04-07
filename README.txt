@@ -1,3 +1,5 @@
+Based on the Organigram module by Frederic Hennequin (https://www.drupal.org/sandbox/daeron/1603000).
+
 Browsersupport
 --------------
 Organigram is tested in the following browsers:

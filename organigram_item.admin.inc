@@ -303,9 +303,6 @@ function organigram_form_organigram_item($form, &$form_state, $edit = array(), $
     $form['#attached']['js'][] = drupal_get_path('module', 'organigram') . '/js/colorpicker.js';
   }
 
-  // Add fields to the form.
-  field_attach_form('organigram_item', $organigram_item, $form, $form_state);
-
   // Return the generated form.
   return $form;
 }
