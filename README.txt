@@ -1,4 +1,9 @@
-Based on the Organigram module by Frederic Hennequin (https://www.drupal.org/sandbox/daeron/1603000).
+Based on the Organigram module by Frederic Hennequin:
+- https://www.drupal.org/sandbox/daeron/1603000
+
+Extended with an improved version of the orgchart library by J. van Loenen:
+- https://jvloenen.home.xs4all.nl/orgchart/sample.htm)
+
 
 Browsersupport
 --------------
