@@ -374,6 +374,9 @@ function organigram_form_organigram_validate($form, &$form_state) {
       form_set_error('machine_name', t('The machine-readable name cannot be "add" or "list".'));
     }
   }
+
+  // Allow the entity fields to be validated.
+  entity_form_field_validate('organigram', $form, $form_state);
 }
 
 /*
@@ -409,6 +412,7 @@ function organigram_form_overview_organigrams_submit($form, &$form_state) {
 function organigram_form_organigram_submit($form, &$form_state) {
   // Retrieve the organigram.
   $organigram = $form_state['organigram'];
+
   // Submit the organigram entity.
   entity_form_submit_build_entity('organigram', $organigram, $form, $form_state);
   // Evaluate the save status.
