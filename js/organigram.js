@@ -7,6 +7,8 @@
   Drupal.behaviors.organigram = {
     attach: function (context, settings) {
 
+      var redrawOnResize = {};
+
       // Start loading organigrams.
       organigramLoader();
 
@@ -127,6 +129,15 @@
               organigram_position = 'center';
             }
 
+            // Add the canvas to the resize watch list.
+            if (organigram_width == 'parent') {
+              // Set a max width to restore the organigram to its original size.
+              if (organigram_data['max_width'] == undefined) {
+                organigram_data['max_width'] = chart_container.parent().width();
+              }
+              redrawOnResize[organigram_id] = organigram_data;
+            }
+
             // Set the color properties.
             color_properties = {
               'border_color': undefined,
@@ -221,6 +232,23 @@
         }
         return properties;
       }
+
+      $(window).resize(function() {
+        // Iterate through all organigrams which need to scale according to its
+        // parent.
+        for (var id in redrawOnResize) {
+          // Retrieve the organigram chart container.
+          var chart_container = $('#organigram-chart-' + id + '-canvas');
+          // Load its parent width.
+          var parent_width = chart_container.parent().width();
+
+          // If the parent width is smaller than the canvas, rescale it.
+          if (parent_width < redrawOnResize[id]['max_width']) {
+            chart_container.width(parent_width);
+            organigramLoad(id, redrawOnResize[id]);
+          }
+        }
+      });
 
     }
   };

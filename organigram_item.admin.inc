@@ -4,29 +4,11 @@
  * Defines the user forms and pages for managing organigram items.
  */
 
-/*
- * Page callback functions.
- */
-
 /**
- * Organigram preview page.
+ * Callback to redirect back to the organigram item list overview.
  *
- * Used by the following menu items:
- * <ul>
- *   <li>organigram/%/preview</li>
- * </ul>
- */
-function organigram_preview_page($organigram_machine_name) {
-  return organigram_embed_organigram($organigram_machine_name);
-}
-
-/**
- * Organigram item overview page.
- *
- * Used by the following menu items:
- * <ul>
- *   <li>admin/structure/organigram/%organigram_machine_name/item/%organigram_item/list</li>
- * </ul>
+ * @param string $organigram_machine_name
+ *   An organigram machine name.
  */
 function organigram_redirect_to_organigram_item_overview($organigram_machine_name) {
   drupal_goto("admin/structure/organigram/{$organigram_machine_name}");

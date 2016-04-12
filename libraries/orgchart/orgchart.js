@@ -100,6 +100,7 @@
 // 2016-04-07 New: Added options to set width and height of the organigram
 // 2016-04-07 New: Node placement takes the organigram width into account
 // 2016-04-07 Fixed: Wrong horizontal offset in multiple l-siblings below each other
+// 2016-04-12 Fixed: Division by zero on auto calculating width and usibs per line
 
 var	G_vmlCanvasManager;	// so non-IE won't freak out
 
@@ -350,12 +351,13 @@ drawChartPriv = function (id, repos, width, height, align)
 	var	i, ctx, devicePixelRatio, backingStoreRatio, cwidth, cheight, ratio;
 
 	theCanvas = document.getElementById(id);
-	if (! theCanvas){
+	if (!theCanvas){
 		alert("Canvas id '" + id + "' not found");
 		return;
 	}
-        if (G_vmlCanvasManager !== undefined){ // ie IE
-                G_vmlCanvasManager.initElement(theCanvas);
+
+	if (G_vmlCanvasManager !== undefined){ // ie IE
+		G_vmlCanvasManager.initElement(theCanvas);
 	}
 
 	ctx = theCanvas.getContext("2d");
@@ -377,7 +379,7 @@ drawChartPriv = function (id, repos, width, height, align)
 	// Set the new canvas width. Add 1 to fix the half pixel bug by which lines
 	// are blurred.
 	if (maxW > 0) {
-		theCanvas.width = maxW + 1;
+		theCanvas.width = parseInt(maxW) + 1;
 	}
 
 	// Calculate the canvas height.
@@ -393,12 +395,14 @@ drawChartPriv = function (id, repos, width, height, align)
 	// Set the new canvas height. Add 1 to fix the half pixel bug by which lines
 	// are blurred.
 	if (maxH > 0) {
-		theCanvas.height = maxH + 1;
+		theCanvas.height = parseInt(maxH) + 1;
 	}
 
 	// Calculate how much siblings fit in one line.
-	if (usibsPerLine == 0) {
-		usibsPerLine = Math.floor(theCanvas.width / (boxWidth + hSpace));
+	if (usibsPerLine == 0 && maxW > 0) {
+		// Add one hSpace to the canvas width to correct the hSpace at the last
+		// boxWidth.
+		usibsPerLine = Math.floor((theCanvas.width + hSpace) / (boxWidth + hSpace));
 	}
 
 	if (repos){
@@ -424,7 +428,9 @@ drawChartPriv = function (id, repos, width, height, align)
 		}
 		// Overwrite the canvas width. Add 1 to fix the half pixel bug by which lines
 		// are blurred.
-		if (maxW > 0) theCanvas.width = maxW + 1;
+		if (maxW > 0) {
+			theCanvas.width = maxW + 1;
+		}
 	}
 
 	// If no height is set, calculate it from the node data.
@@ -434,7 +440,9 @@ drawChartPriv = function (id, repos, width, height, align)
 		}
 		// Overwrite the canvas height. Add 1 to fix the half pixel bug by which lines
 		// are blurred.
-		if (maxH > 0) theCanvas.height = maxH + 1;
+		if (maxH > 0) {
+			theCanvas.height = maxH + 1;
+		}
 	}
 
 	// High dpi displays:
@@ -1787,7 +1795,10 @@ drawConLines = function(ctx)
 			// Draw a line above usibs over multiple rows.
 			if (nodes[i].usib.length > usibsPerLine) {
 				// Calculate over how many rows the usibs should be spread.
-				rows = Math.ceil(nodes[i].usib.length / usibsPerLine);
+				rows = 1;
+				if (usibsPerLine > 0) {
+					rows = Math.ceil(nodes[i].usib.length / usibsPerLine);
+				}
 				if (rows > 1) {
 					for (row = 1; row < rows; row++) {
 						// Get the last usib in line so we know where to draw the line to.

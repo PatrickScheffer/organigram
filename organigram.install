@@ -155,6 +155,12 @@ function organigram_schema() {
         'description' => 'Description of the organigram.',
         'translatable' => TRUE,
       ),
+      'status' => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 1,
+        'description' => 'Boolean indicating whether the organigram should be published or not.',
+      ),
       'canvas_width' => array(
         'type' => 'varchar',
         'length' => 255,
@@ -300,4 +306,18 @@ function organigram_schema() {
     ),
   );
   return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function organigram_install() {
+  // Load all field bundle settings of the organigram entity.
+  $field_bundle_setting = variable_get('field_bundle_settings_organigram__organigram', array());
+  // Set the extra field 'name' by default to visible FALSE in the organigram
+  // view mode.
+  $field_bundle_setting['extra_fields']['display']['name']['organigram']['weight'] = 0;
+  $field_bundle_setting['extra_fields']['display']['name']['organigram']['visible'] = FALSE;
+  // Save the new settings.
+  variable_set('field_bundle_settings_organigram__organigram', $field_bundle_setting);
 }

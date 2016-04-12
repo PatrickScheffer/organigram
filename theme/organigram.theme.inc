@@ -31,6 +31,7 @@ function theme_organigram_form_overview_organigrams($variables) {
       // Render operation links.
       $row[] = drupal_render($child_element['list']);
       $row[] = drupal_render($child_element['add']);
+      $row[] = drupal_render($child_element['view']);
       $row[] = drupal_render($child_element['edit']);
       $row[] = drupal_render($child_element['delete']);
       // Add row to the rows array.
@@ -45,7 +46,7 @@ function theme_organigram_form_overview_organigrams($variables) {
     drupal_add_tabledrag('organigram', 'order', 'sibling', 'organigram-weight');
   }
   // Add operation header.
-  $header[] = array('data' => t('Operations'), 'colspan' => '4');
+  $header[] = array('data' => t('Operations'), 'colspan' => '5');
   return theme('table', array(
     'header' => $header,
     'rows' => $rows,

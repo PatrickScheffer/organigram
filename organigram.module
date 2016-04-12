@@ -61,9 +61,13 @@ function organigram_entity_info() {
       ),
     ),
     'view modes' => array(
+      'organigram' => array(
+        'label' => t('Organigram'),
+        'custom settings' => TRUE,
+      ),
       'organigram_block' => array(
         'label' => t('Organigram block'),
-        'custom settings' => FALSE,
+        'custom settings' => TRUE,
       ),
     ),
     'access callback' => 'organigram_entity_access',
@@ -204,6 +208,13 @@ function organigram_entity_property_info() {
     'setter callback' => 'entity_property_verbatim_set',
     'sanitize' => 'filter_xss',
     'schema field' => 'description',
+  );
+  $properties['status'] = array(
+    'label' => t('status'),
+    'description' => t('The published status of the organigram.'),
+    'setter callback' => 'entity_property_verbatim_set',
+    'required' => FALSE,
+    'schema field' => 'status',
   );
   $properties['canvas_width'] = array(
     'label' => t('Canvas width'),
@@ -365,7 +376,7 @@ function organigram_entity_view($entity, $type, $view_mode, $langcode) {
     // on one page.
     $entity->unique_id = drupal_hash_base64(uniqid(mt_rand(), TRUE) . mt_rand());
     // Compose the organigram.
-    $organigram = organigram_compose_organigram($entity->oid, $langcode);
+    $organigram = organigram_compose_organigram($entity, $langcode);
     // Add it to the content.
     $entity->content['organigram'] = array(
       '#markup' => render($organigram),
@@ -389,11 +400,16 @@ function organigram_field_extra_fields() {
           'name' => array(
             'label' => t('Name'),
             'description' => t('Text'),
-            'weight' => -5,
+            'weight' => -6,
           ),
           'description' => array(
             'label' => t('Description'),
             'description' => t('Long text'),
+            'weight' => -5,
+          ),
+          'status' => array(
+            'label' => t('Published'),
+            'description' => t('Checkbox'),
             'weight' => -4,
           ),
           'organigram_settings' => array(
@@ -461,9 +477,9 @@ function organigram_block_view($delta = '') {
   $block = array('subject' => NULL, 'content' => NULL);
   // Load the organigram.
   $organigram = organigram_load((int) $delta);
-  if (!empty($organigram)) {
+  if (!empty($organigram) && organigram_entity_access('view', $organigram)) {
     // Generate the organigram renderable array.
-    $organigram_renderable_array = entity_view('organigram', array($organigram));
+    $organigram_renderable_array = entity_view('organigram', array($organigram), 'organigram_block');
 
     // Check if generating the organigram was successful.
     if (is_array($organigram_renderable_array)) {
@@ -474,6 +490,77 @@ function organigram_block_view($delta = '') {
   }
   // Return the rendered organigram block.
   return $block;
+}
+
+/**
+ * Admin menu callback to redirect to the organigram view page.
+ *
+ * @param mixed $organigram
+ *   An organigram entity or machine name.
+ */
+function organigram_redirect_to_view_page($organigram) {
+  // Show not found page if no argument is given.
+  if (empty($organigram)) {
+    return drupal_not_found();
+  }
+
+  // Get the machine name.
+  if (is_string($organigram)) {
+    $machine_name = $organigram;
+  }
+  elseif (isset($organigram->machine_name)) {
+    $machine_name = $organigram->machine_name;
+  }
+  else {
+    // If no machine name if found, show not found page.
+    return drupal_not_found();
+  }
+
+  // Redirect to the organigram view page.
+  drupal_goto('organigram/' . $machine_name);
+}
+
+/**
+ * Menu callback to display an organigram.
+ *
+ * @param mixed $organigram
+ *   An organigram entity, ID or machine name.
+ *
+ * @return string|void
+ *   A renderable array or drupal not found.
+ */
+function organigram_view_page($organigram) {
+  // Show the not found page if no argument is given.
+  if (empty($organigram)) {
+    return drupal_not_found();
+  }
+
+  // Retrieve the organigram by ID or by machine name.
+  if (!is_numeric($organigram) && is_string($organigram)) {
+    // Load the organigram by machine name.
+    $organigram = organigram_machine_name_load($organigram);
+  }
+  // Load the organigram by ID.
+  elseif (is_numeric($organigram)) {
+    $organigram = organigram_load($organigram);
+  }
+
+  // Show the not found page if no organigram is loaded.
+  if (empty($organigram)) {
+    return drupal_not_found();
+  }
+
+  // Do an access check.
+  if (!organigram_entity_access('view', $organigram)) {
+    return drupal_access_denied();
+  }
+
+  drupal_set_title($organigram->name);
+
+  // Generate the organigram renderable array.
+  $content = entity_view('organigram', array($organigram), 'organigram');
+
+  return $content;
 }
 
 /**
@@ -521,7 +608,6 @@ function organigram_rdf_mapping() {
 function organigram_menu() {
   $items = array();
 
-  // Administration pages for organigram.
   $items['admin/structure/organigram'] = array(
     'title' => 'Organigram',
     'description' => 'Create and manage organigrams.',
@@ -546,23 +632,6 @@ function organigram_menu() {
     'file' => 'organigram.admin.inc',
   );
 
-  $items['admin/structure/organigram/%organigram_machine_name/edit'] = array(
-    'title' => 'Edit organigram',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('organigram_form_organigram', 3),
-    'access arguments' => array('administer organigram'),
-    'file' => 'organigram.admin.inc',
-  );
-
-  $items['admin/structure/organigram/%organigram_machine_name/delete'] = array(
-    'title' => 'Delete organigram',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('organigram_form_confirm_delete_organigram', 3),
-    'access arguments' => array('administer organigram'),
-    'file' => 'organigram.admin.inc',
-  );
-
-  // Administration pages for organigram items.
   $items['admin/structure/organigram/%organigram_machine_name'] = array(
     'title callback' => 'organigram_title',
     'title arguments' => array(3),
@@ -576,7 +645,7 @@ function organigram_menu() {
   $items['admin/structure/organigram/%organigram_machine_name/list'] = array(
     'title' => 'List items',
     'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -20,
+    'weight' => 2,
   );
 
   $items['admin/structure/organigram/%organigram_machine_name/add'] = array(
@@ -589,15 +658,36 @@ function organigram_menu() {
     'file' => 'organigram_item.admin.inc',
   );
 
-  $items['admin/structure/organigram/%/preview'] = array(
-    'title' => 'Preview organigram',
-    'page callback' => 'organigram_preview_page',
+  $items['admin/structure/organigram/%organigram_machine_name/view'] = array(
+    'title' => 'View',
+    'page callback' => 'organigram_redirect_to_view_page',
     'page arguments' => array(3),
     'access callback' => 'organigram_user_access',
-    'access arguments' => array('edit', 3),
+    'access arguments' => array('view', 3),
     'type' => MENU_LOCAL_TASK,
-    'weight' => -10,
-    'file' => 'organigram_item.admin.inc',
+    'weight' => 1,
+  );
+
+  $items['admin/structure/organigram/%organigram_machine_name/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('organigram_form_organigram', 3),
+    'access callback' => 'organigram_user_access',
+    'access arguments' => array('edit', 3),
+    'file' => 'organigram.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+  );
+
+  $items['admin/structure/organigram/%organigram_machine_name/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('organigram_form_confirm_delete_organigram', 3),
+    'access callback' => 'organigram_user_access',
+    'access arguments' => array('delete', 3),
+    'file' => 'organigram.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 4,
   );
 
   $items['admin/structure/organigram/%organigram_machine_name/item/%organigram_item'] = array(
@@ -638,6 +728,33 @@ function organigram_menu() {
     'weight' => 10,
   );
 
+  $items['organigram/%organigram_machine_name'] = array(
+    'title callback' => 'organigram_title',
+    'title arguments' => array(1),
+    'page callback' => 'organigram_view_page',
+    'page arguments' => array(1),
+    'access callback' => 'organigram_user_access',
+    'access arguments' => array('view', 1),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['organigram/%organigram_machine_name/view'] = array(
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  $items['organigram/%/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'organigram_redirect_to_organigram_item_overview',
+    'page arguments' => array(1),
+    'access callback' => 'organigram_user_access',
+    'access arguments' => array('edit', 1),
+    'file' => 'organigram_item.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 2,
+  );
+
   return $items;
 }
 
@@ -651,6 +768,7 @@ function organigram_permission() {
       'title' => t('Administer organigrams and items'),
     ),
   );
+
   // Iterate through the organigrams.
   foreach (organigram_get_names() as $machine_name => $organigram_info) {
     // Create the translation arguments.
@@ -663,6 +781,7 @@ function organigram_permission() {
       'title' => t('Delete organigram items from %organigram', $t_args),
     );
   }
+
   // Return all permissions.
   return $permissions;
 }
@@ -783,11 +902,16 @@ function organigram_user_access($operation, $object, $account = NULL) {
     }
 
     // Check if the operation describes a view operation.
-    if ($operation == 'view') {
+    if ($operation == 'view' && $object->status) {
       // Check for the access content access right.
       $granted = user_access('access content', $account);
     }
     else {
+      // The view operation is denied so check if the user has edit access.
+      if ($operation == 'view') {
+        $operation = 'edit';
+      }
+
       // Get the machine name.
       $machine_name = isset($object->machine_name) ? $object->machine_name : $object->organigram_machine_name;
       // A user which has not the correct permission will be evaluated for a
@@ -842,7 +966,7 @@ function organigram_item_title($organigram_item) {
  * @return bool
  *   TRUE if the user has permission to perform the operation, otherwise FALSE.
  */
-function organigram_entity_access($op, $entity, $account, $entity_type) {
+function organigram_entity_access($op, $entity, $account = NULL) {
   // Determine whether the given account has access to the entity for the
   // specified operation.
   return organigram_user_access($op, $entity, $account);
@@ -879,7 +1003,7 @@ function organigram_metadata_organigram_item_setter($organigram_item, $name, $va
  * Generate an renderable item list array for the specified organigram.
  *
  * @param mixed $organigram
- *   An organigram ID, machine name or entity.
+ *   An organigram entity.
  * @param string $langcode
  *   The language in which the organigram needs to be rendered.
  *
@@ -889,16 +1013,6 @@ function organigram_metadata_organigram_item_setter($organigram_item, $name, $va
 function organigram_compose_organigram($organigram, $langcode = NULL) {
   // Default output.
   $output = array();
-
-  // Retrieve the organigram by ID or by machine name.
-  if (!is_numeric($organigram) && is_string($organigram)) {
-    // Load the organigram by machine name.
-    $organigram = organigram_machine_name_load($organigram);
-  }
-  // Load the organigram by ID.
-  elseif (is_numeric($organigram)) {
-    $organigram = organigram_load($organigram);
-  }
 
   // Validate loaded organigram.
   if (!$organigram) {

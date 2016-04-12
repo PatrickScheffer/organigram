@@ -4,18 +4,14 @@
  * Defines the administration forms for managing organigrams.
  */
 
-/*
- * Form generator functions.
- */
-
 /**
  * List all organigrams form.
  *
- * Used by the following menu items:
- * <ul>
- *   <li>admin/structure/organigram</li>
- *   <li>admin/structure/organigram/list</li>
- * </ul>
+ * @param array $form
+ *   Contains form elements.
+ *
+ * @return array
+ *   Renderable form array.
  */
 function organigram_form_overview_organigrams($form) {
   // Retrieve all organigrams.
@@ -26,16 +22,20 @@ function organigram_form_overview_organigrams($form) {
   $form['items'] = array();
   // Retrieve organigram count.
   $organigram_count = count($organigrams);
+
   // Iterate through organigrams.
   foreach ($organigrams as $organigram) {
     // Retrieve the form element entry by reference.
     $organigram_element = &$form['items'][$organigram->oid];
-    // Initialize the orgranigram element.
+    // Initialize the organigram element.
     $organigram_element = array();
+
     // Add the organigram as a property of the form element.
     $organigram_element['#organigram'] = $organigram;
+
     // Add organigram name as a markup element.
     $organigram_element['name'] = array('#markup' => check_plain($organigram->name));
+
     // Add organigram weight.
     $organigram_element['weight'] = array(
       '#type' => 'weight',
@@ -44,29 +44,41 @@ function organigram_form_overview_organigrams($form) {
       '#delta' => $organigram_count,
       '#default_value' => $organigram->weight,
     );
-    // Add edit, list and add link.
+
+    // Add list, view, add, edit and delete links.
     $organigram_element['list'] = array(
       '#type' => 'link',
-      '#title' => t('list organigram items'),
+      '#title' => t('list items'),
       '#href' => "admin/structure/organigram/{$organigram->machine_name}",
     );
+
+    $organigram_element['view'] = array(
+      '#type' => 'link',
+      '#title' => t('view'),
+      '#href' => "organigram/{$organigram->machine_name}",
+    );
+
     $organigram_element['add'] = array(
       '#type' => 'link',
-      '#title' => t('add organigram item'),
+      '#title' => t('add item'),
       '#href' => "admin/structure/organigram/{$organigram->machine_name}/add",
     );
+
     $organigram_element['edit'] = array(
       '#type' => 'link',
-      '#title' => t('edit organigram'),
+      '#title' => t('edit'),
       '#href' => "admin/structure/organigram/{$organigram->machine_name}/edit",
     );
+
     $organigram_element['delete'] = array(
       '#type' => 'link',
-      '#title' => t('delete organigram'),
+      '#title' => t('delete'),
       '#href' => "admin/structure/organigram/{$organigram->machine_name}/delete",
     );
   }
+
   $form['#empty_text'] = t('No organigrams available. <a href="@link">Add organigram</a>.', array('@link' => url('admin/structure/organigram/add')));
+
   // Only make this form include a submit button and weight if more than one
   // organigram exists.
   $form['actions'] = array('#type' => 'actions');
@@ -74,17 +86,12 @@ function organigram_form_overview_organigrams($form) {
     '#type' => 'submit',
     '#value' => t('Save'),
   );
+
   return $form;
 }
 
 /**
  * Create or edit an organigram form.
- *
- * Used by the following menu items:
- * <ul>
- *   <li>admin/structure/organigram/add</li>
- *   <li>admin/structure/organigram/%organigram_machine_name/edit</li>
- * </ul>
  */
 function organigram_form_organigram($form, &$form_state, $edit = array()) {
   // During initial form build, add the entity to the form state for use
@@ -98,6 +105,7 @@ function organigram_form_organigram($form, &$form_state, $edit = array()) {
       'name' => '',
       'machine_name' => '',
       'description' => '',
+      'status' => 1,
       'canvas_width' => 'auto',
       'canvas_height' => 'auto',
       'center' => 0,
@@ -135,6 +143,10 @@ function organigram_form_organigram($form, &$form_state, $edit = array()) {
   }
   // Add organigram to the form.
   $form['#organigram'] = $form_state['organigram'];
+
+  // Load the extra fields information so set the correct order.
+  $extrafields = field_info_extra_fields('organigram', 'organigram', 'form');
+
   $form['name'] = array(
     '#type' => 'textfield',
     '#title' => t('Name'),
@@ -142,6 +154,7 @@ function organigram_form_organigram($form, &$form_state, $edit = array()) {
     '#default_value' => $organigram->name,
     '#maxlength' => 255,
     '#required' => TRUE,
+    '#weight' => isset($extrafields['name']['weight']) ? $extrafields['name']['weight'] : 0,
   );
   $form['machine_name'] = array(
     '#type' => 'machine_name',
@@ -160,6 +173,14 @@ function organigram_form_organigram($form, &$form_state, $edit = array()) {
     '#title' => t('Description'),
     '#description' => t('The description can used as an explanatory text.'),
     '#default_value' => $organigram->description,
+    '#weight' => isset($extrafields['#description']['weight']) ? $extrafields['#description']['weight'] : 1,
+  );
+  $form['status'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Published'),
+    '#description' => t('Unpublished organigrams will not be displayed on the website.<br />Note that users with the permission to edit this organigram will still be able to see this organigram.'),
+    '#default_value' => $organigram->status,
+    '#weight' => isset($extrafields['status']['weight']) ? $extrafields['status']['weight'] : 2,
   );
 
   // Canvas settings.
@@ -168,17 +189,18 @@ function organigram_form_organigram($form, &$form_state, $edit = array()) {
     '#title' => t('Organigram settings'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
+    '#weight' => isset($extrafields['organigram_settings']['weight']) ? $extrafields['organigram_settings']['weight'] : 3,
   );
   $form['canvas']['canvas_width'] = array(
     '#type' => 'textfield',
     '#title' => t('Organigram width'),
-    '#description' => t('Specify the width in pixels of the organigram.'),
+    '#description' => t('Specify the width in pixels of the organigram.<br /><br />Other available options:<br /><br /><ul><li><b>auto</b>: Calculate the width by the number of items</li><li><b>parent</b>: Adjust the width to the parent element of the organigram.</li></ul>'),
     '#default_value' => $organigram->canvas_width,
   );
   $form['canvas']['canvas_height'] = array(
     '#type' => 'textfield',
     '#title' => t('Organigram height'),
-    '#description' => t('Specify the height in pixels of the organigram.'),
+    '#description' => t('Specify the height in pixels of the organigram. The same options as width are available here.'),
     '#default_value' => $organigram->canvas_height,
   );
   $form['canvas']['center'] = array(
@@ -203,6 +225,7 @@ function organigram_form_organigram($form, &$form_state, $edit = array()) {
     '#title' => t('Item settings'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
+    '#weight' => isset($extrafields['item_settings']['weight']) ? $extrafields['item_settings']['weight'] : 4,
   );
   $form['node']['node_width'] = array(
     '#type' => 'textfield',
@@ -277,6 +300,7 @@ function organigram_form_organigram($form, &$form_state, $edit = array()) {
     '#title' => t('Font settings'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
+    '#weight' => isset($extrafields['font_settings']['weight']) ? $extrafields['font_settings']['weight'] : 5,
   );
   $form['font']['font_color'] = array(
     '#type' => 'textfield',
@@ -330,11 +354,6 @@ function organigram_form_organigram($form, &$form_state, $edit = array()) {
 
 /**
  * Confirm organigram deletion form.
- *
- * Used by the following menu items:
- * <ul>
- *   <li>admin/structure/organigram/%organigram_machine_name/delete</li>
- * </ul>
  */
 function organigram_form_confirm_delete_organigram($form, &$form_state, $organigram) {
   // Always provide entity id in the same form key as in the entity edit form.
