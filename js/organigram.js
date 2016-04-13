@@ -242,11 +242,9 @@
           // Load its parent width.
           var parent_width = chart_container.parent().width();
 
-          // If the parent width is smaller than the canvas, rescale it.
-          if (parent_width < redrawOnResize[id]['max_width']) {
-            chart_container.width(parent_width);
-            organigramLoad(id, redrawOnResize[id]);
-          }
+          // Update the canvas width and redraw the organigram.
+          chart_container.width(parent_width);
+          organigramLoad(id, redrawOnResize[id]);
         }
       });
 

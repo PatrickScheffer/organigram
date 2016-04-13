@@ -101,6 +101,9 @@
 // 2016-04-07 New: Node placement takes the organigram width into account
 // 2016-04-07 Fixed: Wrong horizontal offset in multiple l-siblings below each other
 // 2016-04-12 Fixed: Division by zero on auto calculating width and usibs per line
+// 2016-04-12 New: Organigram is responsive if width is set to parent and drawChart is called on window resize
+// 2016-04-13 New: Added line connection between multi-row usibs
+// 2016-04-13 Fixed: Blurry lines (also on resize)
 
 var	G_vmlCanvasManager;	// so non-IE won't freak out
 
@@ -380,6 +383,7 @@ drawChartPriv = function (id, repos, width, height, align)
 	// are blurred.
 	if (maxW > 0) {
 		theCanvas.width = parseInt(maxW) + 1;
+		theCanvas.style.width = parseInt(maxW) + 1 + 'px';
 	}
 
 	// Calculate the canvas height.
@@ -396,6 +400,7 @@ drawChartPriv = function (id, repos, width, height, align)
 	// are blurred.
 	if (maxH > 0) {
 		theCanvas.height = parseInt(maxH) + 1;
+		theCanvas.style.height = parseInt(maxH) + 1 + 'px';
 	}
 
 	// Calculate how much siblings fit in one line.
@@ -430,6 +435,7 @@ drawChartPriv = function (id, repos, width, height, align)
 		// are blurred.
 		if (maxW > 0) {
 			theCanvas.width = maxW + 1;
+			theCanvas.style.width = maxW + 1 + 'px';
 		}
 	}
 
@@ -442,17 +448,19 @@ drawChartPriv = function (id, repos, width, height, align)
 		// are blurred.
 		if (maxH > 0) {
 			theCanvas.height = maxH + 1;
+			theCanvas.style.height = maxH + 1 + 'px';
 		}
 	}
 
 	// High dpi displays:
-	if ('devicePixelRatio' in window && theCanvas.width!=0) {
-                devicePixelRatio = window.devicePixelRatio || 1;
-                backingStoreRatio = ctx.webkitBackingStorePixelRatio ||
+	if ('devicePixelRatio' in window && theCanvas.width != 0) {
+		devicePixelRatio = window.devicePixelRatio || 1;
+    backingStoreRatio = ctx.webkitBackingStorePixelRatio ||
 			ctx.mozBackingStorePixelRatio ||
 			ctx.msBackingStorePixelRatio ||
 			ctx.oBackingStorePixelRatio ||
 			ctx.backingStorePixelRatio || 1;
+
 		ratio = devicePixelRatio / backingStoreRatio;
 		cwidth = theCanvas.width;
 		cheight = theCanvas.height;
@@ -469,6 +477,9 @@ drawChartPriv = function (id, repos, width, height, align)
 		}
 	}
 
+	// Fix for blurred lines.
+	ctx.translate(0.5, 0.5);
+
 	// Draw the lines:
 	drawConLines(ctx);
 
@@ -476,7 +487,6 @@ drawChartPriv = function (id, repos, width, height, align)
 	for (i = 0; i < nodes.length; i++){
 		drawNode(ctx, i);
 	}
-
 
 	// Add click behaviour:
 	if (theCanvas.addEventListener){
@@ -1453,8 +1463,8 @@ drawNode = function(ctx, i)
 	var	ix, gradient, maxrad, imgrad;
 	// Fix blurred lines by adding a half pixel to the x and y.
 	// @TODO: Test with odd integers.
-	var	x	= nodes[i].hpos + 0.5;
-	var	y	= nodes[i].vpos + 0.5;
+	var	x	= nodes[i].hpos;
+	var	y	= nodes[i].vpos;
 	var	width	= boxWidth;
 	var	height	= boxHeight;
 	var	txt	= nodes[i].txt;
@@ -1741,7 +1751,7 @@ drawConLines = function(ctx)
 	// Draw all connection lines.
 	// We cannot simply draw all lines, over and over again, as the color will change.
 	// Therefore we draw all lines separate, and only once.
-	var i, f, l, r, v, lastOfLine, lastKey, rows, row, hpos, vpos, f_hpos, f_vpos;
+	var i, f, l, r, v, lastOfLine, lastKey, lastKeyPrevRow, lastPrevRow, rows, row, hpos, vpos, f_hpos, f_vpos, lpr_hpos, lpr_vpos;
 
 	// Set lineWidth to 2px to retain its color.
 	ctx.lineWidth = 1;
@@ -1749,8 +1759,8 @@ drawConLines = function(ctx)
 	ctx.beginPath();
 	for (i = 0; i < nodes.length; i++){
 		// Fix blurred lines by adding a half pixel.
-		hpos = nodes[i].hpos + 0.5;
-		vpos = nodes[i].vpos + 0.5;
+		hpos = nodes[i].hpos;
+		vpos = nodes[i].vpos;
 
 		// Top and left lines of siblings
 		if (nodes[i].parentix >= 0){
@@ -1785,12 +1795,12 @@ drawConLines = function(ctx)
 			}
 
 			// Fix blurred lines by adding a half pixel.
-			f_hpos = nodes[f].hpos + 0.5;
-			f_vpos = nodes[f].vpos + 0.5;
+			f_hpos = nodes[f].hpos;
+			f_vpos = nodes[f].vpos;
 
 			// Draw the first line.
 			ctx.moveTo(f_hpos + boxWidth / 2, f_vpos - vSpace / 2);
-			ctx.lineTo(nodes[lastOfLine].hpos + boxWidth / 2 + 0.5, f_vpos - vSpace / 2);
+			ctx.lineTo(nodes[lastOfLine].hpos + boxWidth / 2, f_vpos - vSpace / 2);
 
 			// Draw a line above usibs over multiple rows.
 			if (nodes[i].usib.length > usibsPerLine) {
@@ -1805,12 +1815,30 @@ drawConLines = function(ctx)
 						// Increase the row with 1 because 1 is actually the second entry
 						// in an array and subtract 1 from the end result to get the last
 						// entry in the row.
-						lastKey = usibsPerLine * (row + 1) - 1;
+						lastKey = (usibsPerLine * (row + 1)) - 1;
 						if (nodes[i].usib[lastKey] != undefined) {
 							lastOfLine = nodes[i].usib[lastKey];
 						}
 						else {
 							lastOfLine = l;
+						}
+
+						// Get the key of the last usib of the previous row.
+						lastKeyPrevRow = (usibsPerLine * (row)) - 1;
+						if (nodes[i].usib[lastKeyPrevRow] != undefined) {
+							// Load its position.
+							lastPrevRow = nodes[i].usib[lastKeyPrevRow];
+							lpr_hpos = nodes[lastPrevRow].hpos;
+							lpr_vpos = nodes[lastPrevRow].vpos;
+
+							// Draw a line from the last usib of the previous row to the first
+							// of the current row.
+							ctx.moveTo(lpr_hpos + boxWidth / 2, lpr_vpos - vSpace / 2);
+							ctx.lineTo(lpr_hpos + boxWidth + hSpace / 2, lpr_vpos - vSpace / 2);
+							ctx.moveTo(lpr_hpos + boxWidth + hSpace / 2, lpr_vpos - vSpace / 2);
+							ctx.lineTo(lpr_hpos + boxWidth + hSpace / 2, lpr_vpos + boxHeight + vSpace / 2);
+							ctx.moveTo(lpr_hpos + boxWidth + hSpace / 2, lpr_vpos + boxHeight + vSpace / 2);
+							ctx.lineTo(f_hpos + boxWidth / 2, f_vpos + (vSpace + boxHeight) * row - vSpace / 2);
 						}
 
 						// Draw the line from:
@@ -1820,7 +1848,7 @@ drawConLines = function(ctx)
 						// Draw the line to:
 						// Last usib x: nodes[lastOfLine].hpos + boxWidth / 2
 						// First usib y: nodes[f].vpos + (vSpace + boxHeight) * row - vSpace / 2
-						ctx.lineTo(nodes[lastOfLine].hpos + boxWidth / 2 + 0.5, f_vpos + (vSpace + boxHeight) * row - vSpace / 2);
+						ctx.lineTo(nodes[lastOfLine].hpos + boxWidth / 2, f_vpos + (vSpace + boxHeight) * row - vSpace / 2);
 					}
 				}
 			}
