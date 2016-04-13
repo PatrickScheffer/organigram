@@ -495,13 +495,13 @@ function organigram_block_view($delta = '') {
 /**
  * Admin menu callback to redirect to the organigram view page.
  *
- * @param mixed $organigram
+ * @param $organigram
  *   An organigram entity or machine name.
  */
 function organigram_redirect_to_view_page($organigram) {
   // Show not found page if no argument is given.
   if (empty($organigram)) {
-    return drupal_not_found();
+    drupal_not_found();
   }
 
   // Get the machine name.
@@ -513,7 +513,7 @@ function organigram_redirect_to_view_page($organigram) {
   }
   else {
     // If no machine name if found, show not found page.
-    return drupal_not_found();
+    drupal_not_found();
   }
 
   // Redirect to the organigram view page.
@@ -523,16 +523,16 @@ function organigram_redirect_to_view_page($organigram) {
 /**
  * Menu callback to display an organigram.
  *
- * @param mixed $organigram
+ * @param $organigram
  *   An organigram entity, ID or machine name.
  *
- * @return string|void
+ * @return array
  *   A renderable array or drupal not found.
  */
 function organigram_view_page($organigram) {
   // Show the not found page if no argument is given.
   if (empty($organigram)) {
-    return drupal_not_found();
+    drupal_not_found();
   }
 
   // Retrieve the organigram by ID or by machine name.
@@ -547,12 +547,12 @@ function organigram_view_page($organigram) {
 
   // Show the not found page if no organigram is loaded.
   if (empty($organigram)) {
-    return drupal_not_found();
+    drupal_not_found();
   }
 
   // Do an access check.
   if (!organigram_entity_access('view', $organigram)) {
-    return drupal_access_denied();
+    drupal_access_denied();
   }
 
   drupal_set_title($organigram->name);
@@ -960,8 +960,6 @@ function organigram_item_title($organigram_item) {
  *   An organigram entity on which the operation will be performed.
  * @param object $account
  *   The account to check, if not given use currently logged in user.
- * @param string $entity_type
- *   The entity type of the given entity.
  *
  * @return bool
  *   TRUE if the user has permission to perform the operation, otherwise FALSE.

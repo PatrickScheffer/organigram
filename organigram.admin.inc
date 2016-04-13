@@ -7,7 +7,7 @@
 /**
  * List all organigrams form.
  *
- * @param array $form
+ * @param $form
  *   Contains form elements.
  *
  * @return array
@@ -92,6 +92,16 @@ function organigram_form_overview_organigrams($form) {
 
 /**
  * Create or edit an organigram form.
+ *
+ * @param $form
+ *   The form being used to edit the node.
+ * @param $form_state
+ *   The form state array.
+ * @param $edit
+ *   The object to update.
+ *
+ * @return mixed
+ *   Renderable array containing a form.
  */
 function organigram_form_organigram($form, &$form_state, $edit = array()) {
   // During initial form build, add the entity to the form state for use
@@ -354,6 +364,16 @@ function organigram_form_organigram($form, &$form_state, $edit = array()) {
 
 /**
  * Confirm organigram deletion form.
+ *
+ * @param $form
+ *   The form being used to edit the node.
+ * @param $form_state
+ *   The form state array.
+ * @param $organigram
+ *   The object to delete.
+ *
+ * @return mixed
+ *   Renderable array containing a form.
  */
 function organigram_form_confirm_delete_organigram($form, &$form_state, $organigram) {
   // Always provide entity id in the same form key as in the entity edit form.

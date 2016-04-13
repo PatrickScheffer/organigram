@@ -118,7 +118,7 @@ function organigram_schema() {
       ),
     ),
     'indexes' => array(
-      'orgranigram_tree' => array('oid', 'name', 'parent', 'weight'),
+      'organigram_tree' => array('oid', 'name', 'parent', 'weight'),
       'oid_name' => array('oid', 'name'),
       'name' => array('name'),
     ),

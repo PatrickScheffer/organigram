@@ -80,6 +80,7 @@
 //
 // Change history:
 // ===============
+// J. van Loenen
 // 2013-02-23	New: Lines breaks on \n sequences
 // 2013-02-28 New: redrawChart()
 // 2013-03-12	New: drawChart() will reset first: you can add/move nodes and redraw on an existing chart
@@ -97,6 +98,7 @@
 // 2014-01-09	Fixed: Image-not-found images wrong placed
 // 2015-11-20	Fixed: Overlapping nodes on using r-siblings only
 // 2015-11-23	Fixed: Wrong positioning on some complex examples
+// P. Scheffer
 // 2016-04-07 New: Added options to set width and height of the organigram
 // 2016-04-07 New: Node placement takes the organigram width into account
 // 2016-04-07 Fixed: Wrong horizontal offset in multiple l-siblings below each other

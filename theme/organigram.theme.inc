@@ -6,6 +6,14 @@
 
 /**
  * Theme function for the form 'organigram_form_overview_organigrams'.
+ *
+ * @param $variables
+ *   An array containing form elements.
+ *
+ * @return string
+ *   Rendered form.
+ *
+ * @throws \Exception
  */
 function theme_organigram_form_overview_organigrams($variables) {
   // Retrieve the form element.
@@ -18,7 +26,7 @@ function theme_organigram_form_overview_organigrams($variables) {
     $child_element = &$form['items'][$key];
     // Only render row if the name element is set.
     if (isset($child_element['name'])) {
-      // Initiliaze row variable.
+      // Initialize row variable.
       $row = array();
       $row[] = drupal_render($child_element['name']);
       // The weight column is not included if there is only one organigram.
@@ -59,6 +67,14 @@ function theme_organigram_form_overview_organigrams($variables) {
 
 /**
  * Theme function for the form 'organigram_form_overview_organigram_items'.
+ *
+ * @param array $variables
+ *   An array containing form elements.
+ *
+ * @return string
+ *   Rendered form.
+ *
+ * @throws \Exception
  */
 function theme_organigram_form_overview_organigram_items($variables) {
   $form = $variables['form'];
