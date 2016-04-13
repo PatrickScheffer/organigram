@@ -106,6 +106,7 @@
 // 2016-04-12 New: Organigram is responsive if width is set to parent and drawChart is called on window resize
 // 2016-04-13 New: Added line connection between multi-row usibs
 // 2016-04-13 Fixed: Blurry lines (also on resize)
+// 2016-04-13 Fixed: Cursor stays pointer when moving to fast off canvas
 
 var	G_vmlCanvasManager;	// so non-IE won't freak out
 
@@ -152,6 +153,7 @@ var	lineColor = "#3388DD",		// Color of the connection lines (global for all lin
 
 var	drawChartPriv,
 	orgChartMouseMove,
+	orgChartResetCursor,
 	orgChartClick,
 	vShiftUsibUnderParent,
 	vShiftTree,
@@ -491,10 +493,11 @@ drawChartPriv = function (id, repos, width, height, align)
 	}
 
 	// Add click behaviour:
-	if (theCanvas.addEventListener){
+	if (theCanvas.addEventListener) {
 		theCanvas.removeEventListener("click", orgChartClick, false);	// If any old on this canvas, remove it
 		theCanvas.addEventListener("click", orgChartClick, false);
 		theCanvas.addEventListener("mousemove", orgChartMouseMove, false);
+		theCanvas.addEventListener("mouseout", orgChartResetCursor, false);
 	} else if (theCanvas.attachEvent){ // IE
 		theCanvas.onclick = function () {
 			var mtarget = document.getElementById(id);
@@ -503,6 +506,9 @@ drawChartPriv = function (id, repos, width, height, align)
 		theCanvas.onmousemove = function () {
 			var mtarget = document.getElementById(id);
 			orgChartMouseMove(event, mtarget.scrollLeft, mtarget.scrollTop - 20);
+		};
+		theCanvas.onmouseout = function () {
+			orgChartResetCursor();
 		};
 	}
 }
@@ -514,8 +520,8 @@ orgChartMouseMove = function(event)
 	x = event.clientX;
 	y = event.clientY;
 
-        x -= getAbsPosX(theCanvas);
-        y -= getAbsPosY(theCanvas);
+	x -= getAbsPosX(theCanvas);
+	y -= getAbsPosY(theCanvas);
 
 	if (document.documentElement && document.documentElement.scrollLeft){
 		x += document.documentElement.scrollLeft;
@@ -532,6 +538,13 @@ orgChartMouseMove = function(event)
 	if (i >= 0 && nodes[i].url.length > 0){
 		document.body.style.cursor = 'pointer';
 	}else{
+		document.body.style.cursor = 'default';
+	}
+};
+
+orgChartResetCursor = function(event)
+{
+	if (document.body.style.cursor == 'pointer') {
 		document.body.style.cursor = 'default';
 	}
 };
