@@ -13,12 +13,13 @@ CONTENTS OF THIS FILE
 INTRODUCTION
 ------------
 
-Organigram provides the ability to easily create and manage organization charts,
+Organigrams provides the ability to easily create and manage organization charts,
 also knows as organigrams.
 
 You can create organigram bundles (with own fields and display) and add
 organigram items to that bundles. These items contain a static set of fields and
-are not fieldable.
+are not fieldable. An organigram will be available as dedicated page
+(organigram/%organigram_machine_name) and as a block.
 
 Organigrams are highly customizable. Almost every aspect can be modified,
 from border and background colors to horizontal spacing between items.
@@ -27,7 +28,7 @@ In addition, most of these settings can be overridden per item.
 An organigram is drawn in an HTML5 canvas and is supported by all major
 browsers. See the section 'BROWSER SUPPORT' section for more information.
 
-One of Organigram's key features is responsiveness. When an organigram has a
+One of Organigrams' key features is responsiveness. When an organigram has a
 fixed width it will divide its children over multiple rows to take the given
 width into account.
 When the width of an organigram is set to match the width of its parent element,
@@ -97,7 +98,7 @@ CONFIGURATION
 
  * Configure user permissions in Administration >> People >> Permissions:
 
-   - Manage organigram
+   - Manage organigrams
      Administer all organigrams and items.
 
    - Edit organigram %organigram
@@ -110,7 +111,7 @@ CONFIGURATION
 BROWSER SUPPORT
 --------------_
 
-Organigram is tested in the following browsers:
+Organigrams is tested in the following browsers:
 
  * Google Chrome version 43.0.2357.124
  * Mozilla Firefox version 40.0.3

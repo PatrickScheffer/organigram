@@ -5,7 +5,7 @@
  */
 
 (function($) {
-  Drupal.behaviors.organigram = {
+  Drupal.behaviors.organigrams = {
     attach: function(context, settings) {
 
       // Check if the colorpicker plugin is loaded.

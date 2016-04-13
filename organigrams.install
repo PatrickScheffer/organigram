@@ -1,16 +1,16 @@
 <?php
 /**
  * @file
- * Defines the schema for the organigram module.
+ * Defines the schema for the organigrams module.
  */
 
 /**
  * Implements hook_schema().
  */
-function organigram_schema() {
+function organigrams_schema() {
   $schema = array();
-  // Entity 'organigram_item' base table.
-  $schema['organigram_item_data'] = array(
+  // Entity 'organigrams_item' base table.
+  $schema['organigrams_item_data'] = array(
     'description' => 'Base table for the organigram item entity',
     'fields' => array(
       'iid' => array(
@@ -24,7 +24,7 @@ function organigram_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
-        'description' => 'The {organigram}.oid of the organigram to which the term is assigned.',
+        'description' => 'The {organigrams}.oid of the organigram to which the term is assigned.',
       ),
       'name' => array(
         'type' => 'varchar',
@@ -39,7 +39,7 @@ function organigram_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
-        'description' => "Primary Key: The {organigram_item_data}.iid of the organigram item parent. 0 indicates no parent.",
+        'description' => "Primary Key: The {organigrams_item_data}.iid of the organigram item parent. 0 indicates no parent.",
       ),
       'position' => array(
         'type' => 'varchar',
@@ -113,7 +113,7 @@ function organigram_schema() {
     'primary key' => array('iid'),
     'foreign keys' => array(
       'organigram' => array(
-        'table' => 'organigram_data',
+        'table' => 'organigrams_data',
         'columns' => array('oid' => 'oid'),
       ),
     ),
@@ -123,8 +123,8 @@ function organigram_schema() {
       'name' => array('name'),
     ),
   );
-  // Entity 'organigram' base table.
-  $schema['organigram_data'] = array(
+  // Entity 'organigrams' base table.
+  $schema['organigrams_data'] = array(
     'description' => 'Base table for the organigram entity',
     'fields' => array(
       'oid' => array(
@@ -311,13 +311,13 @@ function organigram_schema() {
 /**
  * Implements hook_install().
  */
-function organigram_install() {
+function organigrams_install() {
   // Load all field bundle settings of the organigram entity.
-  $field_bundle_setting = variable_get('field_bundle_settings_organigram__organigram', array());
+  $field_bundle_setting = variable_get('field_bundle_settings_organigrams__organigrams', array());
   // Set the extra field 'name' by default to visible FALSE in the organigram
   // view mode.
   $field_bundle_setting['extra_fields']['display']['name']['organigram']['weight'] = 0;
   $field_bundle_setting['extra_fields']['display']['name']['organigram']['visible'] = FALSE;
   // Save the new settings.
-  variable_set('field_bundle_settings_organigram__organigram', $field_bundle_setting);
+  variable_set('field_bundle_settings_organigrams__organigrams', $field_bundle_setting);
 }

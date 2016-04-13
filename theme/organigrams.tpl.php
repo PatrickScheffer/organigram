@@ -28,7 +28,7 @@
  * @see template_process()
  */
 ?>
-<div class="organigram organigram-<?php print $organigram->oid;?> <?php print $classes; ?> clearfix"<?php print $attributes; ?>>
+<div class="organigram organigram-<?php print $organigrams->oid;?> <?php print $classes; ?> clearfix"<?php print $attributes; ?>>
   <?php if (!empty($content['name'])): ?>
     <h2><?php print render($content['name']); ?></h2>
     <?php hide($content['name']); ?>
@@ -42,7 +42,7 @@
   <?php endif;?>
 
   <?php if (!empty($content['organigram'])): ?>
-    <div id="organigram-items-<?php print $organigram->unique_id; ?>" class="organigram-items">
+    <div id="organigram-items-<?php print $organigrams->unique_id; ?>" class="organigram-items">
       <?php print render($content['organigram']); ?>
     </div>
     <?php hide($content['organigram']); ?>

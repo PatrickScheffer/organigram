@@ -13,15 +13,15 @@
  * @return array
  *   Renderable form array.
  */
-function organigram_form_overview_organigrams($form) {
+function organigrams_form_overview_organigrams($form) {
   // Retrieve all organigrams.
-  $organigrams = organigram_get_organigrams();
+  $organigrams = organigrams_get_organigrams();
   // All form should be rendered as a tree.
   $form['#tree'] = TRUE;
   // Add items container.
   $form['items'] = array();
-  // Retrieve organigram count.
-  $organigram_count = count($organigrams);
+  // Retrieve organigrams count.
+  $organigrams_count = count($organigrams);
 
   // Iterate through organigrams.
   foreach ($organigrams as $organigram) {
@@ -41,7 +41,7 @@ function organigram_form_overview_organigrams($form) {
       '#type' => 'weight',
       '#title' => t('Weight for @name', array('@name' => $organigram->name)),
       '#title_display' => 'invisible',
-      '#delta' => $organigram_count,
+      '#delta' => $organigrams_count,
       '#default_value' => $organigram->weight,
     );
 
@@ -49,35 +49,35 @@ function organigram_form_overview_organigrams($form) {
     $organigram_element['list'] = array(
       '#type' => 'link',
       '#title' => t('list items'),
-      '#href' => "admin/structure/organigram/{$organigram->machine_name}",
+      '#href' => "admin/structure/organigrams/{$organigram->machine_name}",
     );
 
     $organigram_element['view'] = array(
       '#type' => 'link',
       '#title' => t('view'),
-      '#href' => "organigram/{$organigram->machine_name}",
+      '#href' => "organigrams/{$organigram->machine_name}",
     );
 
     $organigram_element['add'] = array(
       '#type' => 'link',
       '#title' => t('add item'),
-      '#href' => "admin/structure/organigram/{$organigram->machine_name}/add",
+      '#href' => "admin/structure/organigrams/{$organigram->machine_name}/add",
     );
 
     $organigram_element['edit'] = array(
       '#type' => 'link',
       '#title' => t('edit'),
-      '#href' => "admin/structure/organigram/{$organigram->machine_name}/edit",
+      '#href' => "admin/structure/organigrams/{$organigram->machine_name}/edit",
     );
 
     $organigram_element['delete'] = array(
       '#type' => 'link',
       '#title' => t('delete'),
-      '#href' => "admin/structure/organigram/{$organigram->machine_name}/delete",
+      '#href' => "admin/structure/organigrams/{$organigram->machine_name}/delete",
     );
   }
 
-  $form['#empty_text'] = t('No organigrams available. <a href="@link">Add organigram</a>.', array('@link' => url('admin/structure/organigram/add')));
+  $form['#empty_text'] = t('No organigrams available. <a href="@link">Add organigram</a>.', array('@link' => url('admin/structure/organigrams/add')));
 
   // Only make this form include a submit button and weight if more than one
   // organigram exists.
@@ -103,7 +103,7 @@ function organigram_form_overview_organigrams($form) {
  * @return mixed
  *   Renderable array containing a form.
  */
-function organigram_form_organigram($form, &$form_state, $edit = array()) {
+function organigrams_form_organigrams($form, &$form_state, $edit = array()) {
   // During initial form build, add the entity to the form state for use
   // during form building and processing. During a rebuild, use what is in
   // the form state.
@@ -155,7 +155,7 @@ function organigram_form_organigram($form, &$form_state, $edit = array()) {
   $form['#organigram'] = $form_state['organigram'];
 
   // Load the extra fields information so set the correct order.
-  $extrafields = field_info_extra_fields('organigram', 'organigram', 'form');
+  $extrafields = field_info_extra_fields('organigrams', 'organigrams', 'form');
 
   $form['name'] = array(
     '#type' => 'textfield',
@@ -171,7 +171,7 @@ function organigram_form_organigram($form, &$form_state, $edit = array()) {
     '#default_value' => $organigram->machine_name,
     '#maxlength' => 255,
     '#machine_name' => array(
-      'exists' => 'organigram_machine_name_load',
+      'exists' => 'organigrams_machine_name_load',
     ),
   );
   $form['old_machine_name'] = array(
@@ -196,20 +196,20 @@ function organigram_form_organigram($form, &$form_state, $edit = array()) {
   // Canvas settings.
   $form['canvas'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Organigram settings'),
+    '#title' => t('organigram settings'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
     '#weight' => isset($extrafields['organigram_settings']['weight']) ? $extrafields['organigram_settings']['weight'] : 3,
   );
   $form['canvas']['canvas_width'] = array(
     '#type' => 'textfield',
-    '#title' => t('Organigram width'),
+    '#title' => t('organigram width'),
     '#description' => t('Specify the width in pixels of the organigram.<br /><br />Other available options:<br /><br /><ul><li><b>auto</b>: Calculate the width by the number of items</li><li><b>parent</b>: Adjust the width to the parent element of the organigram.</li></ul>'),
     '#default_value' => $organigram->canvas_width,
   );
   $form['canvas']['canvas_height'] = array(
     '#type' => 'textfield',
-    '#title' => t('Organigram height'),
+    '#title' => t('organigram height'),
     '#description' => t('Specify the height in pixels of the organigram. The same options as width are available here.'),
     '#default_value' => $organigram->canvas_height,
   );
@@ -240,13 +240,13 @@ function organigram_form_organigram($form, &$form_state, $edit = array()) {
   $form['node']['node_width'] = array(
     '#type' => 'textfield',
     '#title' => t('Item width'),
-    '#description' => t('Specify the width in pixels of the items in this organigram.<br>Extra options are <b>auto</b> for automatic width calculation and <b>parent</b> to use the width of its parent container'),
+    '#description' => t('Specify the width in pixels of the items in this organigram.'),
     '#default_value' => $organigram->node_width,
   );
   $form['node']['node_height'] = array(
     '#type' => 'textfield',
     '#title' => t('Item height'),
-    '#description' => t('Specify the height in pixels of the items in this organigram.<br>Extra options are <b>auto</b> for automatic height calculation and <b>parent</b> to use the height of its parent container'),
+    '#description' => t('Specify the height in pixels of the items in this organigram.'),
     '#default_value' => $organigram->node_height,
   );
   $form['node']['top_radius'] = array(
@@ -352,11 +352,11 @@ function organigram_form_organigram($form, &$form_state, $edit = array()) {
   $form['#attached']['libraries_load'][] = array('colorpicker');
   $library = libraries_detect('colorpicker');
   if (!empty($library['installed'])) {
-    $form['#attached']['js'][] = drupal_get_path('module', 'organigram') . '/js/colorpicker.js';
+    $form['#attached']['js'][] = drupal_get_path('module', 'organigrams') . '/js/colorpicker.js';
   }
 
   // Add fields to the form.
-  field_attach_form('organigram', $organigram, $form, $form_state);
+  field_attach_form('organigrams', $organigram, $form, $form_state);
 
   // Return the generated form.
   return $form;
@@ -375,7 +375,7 @@ function organigram_form_organigram($form, &$form_state, $edit = array()) {
  * @return mixed
  *   Renderable array containing a form.
  */
-function organigram_form_confirm_delete_organigram($form, &$form_state, $organigram) {
+function organigrams_form_confirm_delete_organigrams($form, &$form_state, $organigram) {
   // Always provide entity id in the same form key as in the entity edit form.
   $form['oid'] = array('#type' => 'value', '#value' => $organigram->oid);
   // Add organigram to the form.
@@ -385,7 +385,7 @@ function organigram_form_confirm_delete_organigram($form, &$form_state, $organig
   return confirm_form(
       $form,
       t('Are you sure you want to delete the organigram %name?', array('%name' => $organigram->name)),
-      'admin/structure/organigram',
+      'admin/structure/organigrams',
       t('Deleting an organigram will delete all the organigram items in it. This action cannot be undone.'),
       t('Delete'),
       t('Cancel')
@@ -397,14 +397,14 @@ function organigram_form_confirm_delete_organigram($form, &$form_state, $organig
  */
 
 /**
- * Form validation handler for 'organigram_form_organigram'.
+ * Form validation handler for 'organigrams_form_organigrams'.
  */
-function organigram_form_organigram_validate($form, &$form_state) {
+function organigrams_form_organigrams_validate($form, &$form_state) {
   // During the deletion there is no 'machine_name' key.
   if (isset($form_state['values']['machine_name'])) {
-    // Do not allow machine names to conflict with organigram path arguments.
+    // Do not allow machine names to conflict with organigrams path arguments.
     $machine_name = $form_state['values']['machine_name'];
-    // Invalid machine names which will conflict with the organigram path
+    // Invalid machine names which will conflict with the organigrams path
     // arguments.
     $disallowed = array('add', 'list');
     // Check if the machine name has on of the disallowed values.
@@ -415,7 +415,7 @@ function organigram_form_organigram_validate($form, &$form_state) {
   }
 
   // Allow the entity fields to be validated.
-  entity_form_field_validate('organigram', $form, $form_state);
+  entity_form_field_validate('organigrams', $form, $form_state);
 }
 
 /*
@@ -423,9 +423,9 @@ function organigram_form_organigram_validate($form, &$form_state) {
  */
 
 /**
- * Form submit handler for 'organigram_form_overview_organigrams'.
+ * Form submit handler for 'organigrams_form_overview_organigrams'.
  */
-function organigram_form_overview_organigrams_submit($form, &$form_state) {
+function organigrams_form_overview_organigrams_submit($form, &$form_state) {
   // Check if the form state contains any items.
   if (!empty($form_state['values']['items'])) {
     // Iterate through the form state values.
@@ -439,49 +439,49 @@ function organigram_form_overview_organigrams_submit($form, &$form_state) {
         // Save the new weight.
         $organigram->weight = $weight;
         // Save changes to the DB.
-        organigram_save($organigram);
+        organigrams_save($organigram);
       }
     }
   }
 }
 
 /**
- * Form submit handler for 'organigram_form_organigram'.
+ * Form submit handler for 'organigrams_form_organigrams'.
  */
-function organigram_form_organigram_submit($form, &$form_state) {
+function organigrams_form_organigrams_submit($form, &$form_state) {
   // Retrieve the organigram.
   $organigram = $form_state['organigram'];
 
-  // Submit the organigram entity.
-  entity_form_submit_build_entity('organigram', $organigram, $form, $form_state);
+  // Submit the organigrams entity.
+  entity_form_submit_build_entity('organigrams', $organigram, $form, $form_state);
   // Evaluate the save status.
-  switch (organigram_save($organigram)) {
+  switch (organigrams_save($organigram)) {
     case SAVED_NEW:
       drupal_set_message(t('Created new organigram %name.', array('%name' => $organigram->name)));
-      watchdog('organigram', 'Created new organigram %name.', array('%name' => $organigram->name), WATCHDOG_NOTICE, l(t('edit'), "admin/structure/organigram/{$organigram->machine_name}/edit"));
+      watchdog('organigrams', 'Created new organigram %name.', array('%name' => $organigram->name), WATCHDOG_NOTICE, l(t('edit'), "admin/structure/organigrams/{$organigram->machine_name}/edit"));
       break;
 
     case SAVED_UPDATED:
       drupal_set_message(t('Updated organigram %name.', array('%name' => $organigram->name)));
-      watchdog('organigram', 'Updated organigram %name.', array('%name' => $organigram->name), WATCHDOG_NOTICE, l(t('edit'), "admin/structure/organigram/{$organigram->machine_name}/edit"));
+      watchdog('organigrams', 'Updated organigram %name.', array('%name' => $organigram->name), WATCHDOG_NOTICE, l(t('edit'), "admin/structure/organigrams/{$organigram->machine_name}/edit"));
       break;
   }
-  // Add organigram  information to the form state.
+  // Add organigram information to the form state.
   $form_state['values']['oid'] = $organigram->oid;
   $form_state['oid'] = $organigram->oid;
-  // Redirect to the 'admin/structure/organigram' page.
-  $form_state['redirect'] = 'admin/structure/organigram';
+  // Redirect to the 'admin/structure/organigrams' page.
+  $form_state['redirect'] = 'admin/structure/organigrams';
 }
 
 /**
- * Form submit handler for 'organigram_form_confirm_delete_organigram'.
+ * Form submit handler for 'organigrams_form_confirm_delete_organigrams'.
  */
-function organigram_form_confirm_delete_organigram_submit($form, &$form_state) {
+function organigrams_form_confirm_delete_organigrams_submit($form, &$form_state) {
   // Delete the organigram.
-  organigram_delete($form_state['values']['oid']);
+  organigrams_delete($form_state['values']['oid']);
   drupal_set_message(t('Deleted organigram %name', array('%name' => $form_state['values']['name'])));
-  watchdog('organigram', 'Deleted organigram %name', array('%name' => $form_state['values']['name']), WATCHDOG_NOTICE);
-  $form_state['redirect'] = 'admin/structure/organigram';
+  watchdog('organigrams', 'Deleted organigram %name', array('%name' => $form_state['values']['name']), WATCHDOG_NOTICE);
+  $form_state['redirect'] = 'admin/structure/organigrams';
   // Clear the page and block caches to avoid stale data.
   cache_clear_all();
 }

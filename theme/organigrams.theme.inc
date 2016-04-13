@@ -1,11 +1,11 @@
 <?php
 /**
  * @file
- * Defines the theme functions used by the organigram module.
+ * Defines the theme functions used by the organigrams module.
  */
 
 /**
- * Theme function for the form 'organigram_form_overview_organigrams'.
+ * Theme function for the form 'organigrams_form_overview_organigrams'.
  *
  * @param $variables
  *   An array containing form elements.
@@ -15,7 +15,7 @@
  *
  * @throws \Exception
  */
-function theme_organigram_form_overview_organigrams($variables) {
+function theme_organigrams_form_overview_organigrams($variables) {
   // Retrieve the form element.
   $form = $variables['form'];
   // Initialize rows array.
@@ -31,7 +31,7 @@ function theme_organigram_form_overview_organigrams($variables) {
       $row[] = drupal_render($child_element['name']);
       // The weight column is not included if there is only one organigram.
       if (isset($child_element['weight'])) {
-        // Add the 'organigram-weight' to the weight element class attribute.
+        // Add 'organigram-weight' to the weight element class attribute.
         $child_element['weight']['#attributes']['class'] = array('organigram-weight');
         // Render weight element.
         $row[] = drupal_render($child_element['weight']);
@@ -51,7 +51,7 @@ function theme_organigram_form_overview_organigrams($variables) {
   // The weight column is omitted if less then two rows are present.
   if (isset($form['actions'])) {
     $header[] = t('Weight');
-    drupal_add_tabledrag('organigram', 'order', 'sibling', 'organigram-weight');
+    drupal_add_tabledrag('organigrams', 'order', 'sibling', 'organigram-weight');
   }
   // Add operation header.
   $header[] = array('data' => t('Operations'), 'colspan' => '5');
@@ -60,13 +60,13 @@ function theme_organigram_form_overview_organigrams($variables) {
     'rows' => $rows,
     'empty' => $form['#empty_text'],
     'attributes' => array(
-      'id' => 'organigram',
+      'id' => 'organigrams',
     ),
   )) . drupal_render_children($form);
 }
 
 /**
- * Theme function for the form 'organigram_form_overview_organigram_items'.
+ * Theme function for the form 'organigrams_form_overview_organigrams_items'.
  *
  * @param array $variables
  *   An array containing form elements.
@@ -76,12 +76,12 @@ function theme_organigram_form_overview_organigrams($variables) {
  *
  * @throws \Exception
  */
-function theme_organigram_form_overview_organigram_items($variables) {
+function theme_organigrams_form_overview_organigrams_items($variables) {
   $form = $variables['form'];
   // Add support for table drag.
-  drupal_add_tabledrag('organigram_items', 'order', 'sibling', 'organigram-item-weight');
-  drupal_add_tabledrag('organigram_items', 'match', 'parent', 'organigram-item-parent', 'organigram-item-parent', 'organigram-item-id', FALSE);
-  drupal_add_tabledrag('organigram_items', 'depth', 'group', 'organigram-item-depth', NULL, NULL, FALSE);
+  drupal_add_tabledrag('organigrams_items', 'order', 'sibling', 'organigram-item-weight');
+  drupal_add_tabledrag('organigrams_items', 'match', 'parent', 'organigram-item-parent', 'organigram-item-parent', 'organigram-item-id', FALSE);
+  drupal_add_tabledrag('organigrams_items', 'depth', 'group', 'organigram-item-depth', NULL, NULL, FALSE);
   // Initialize rows array.
   $rows = array();
   // Iterate through the element child names.
@@ -89,7 +89,7 @@ function theme_organigram_form_overview_organigram_items($variables) {
     // Retrieve the organigram item element by reference.
     $child_element = &$form['items'][$key];
     // Retrieve the organigram item.
-    $organigram_item = $child_element['#organigram_item'];
+    $organigram_item = $child_element['#organigrams_item'];
     // Initialize row array.
     $row = array();
     $row[] = theme('indentation', array('size' => $organigram_item->depth)) . drupal_render($child_element['view']);
@@ -120,7 +120,7 @@ function theme_organigram_form_overview_organigram_items($variables) {
     'rows' => $rows,
     'empty' => $form['#empty_text'],
     'attributes' => array(
-      'id' => 'organigram_items',
+      'id' => 'organigrams_items',
     ),
   )) . drupal_render_children($form);
 }

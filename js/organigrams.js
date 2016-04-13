@@ -4,7 +4,7 @@
  */
 
 (function ($) {
-  Drupal.behaviors.organigram = {
+  Drupal.behaviors.organigrams = {
     attach: function (context, settings) {
 
       var redrawOnResize = {};
@@ -19,9 +19,9 @@
         // Are there organigrams that need processing?
         if (organigramSettingExists('organigrams')) {
           // Iterate through the organigram callbacks.
-          for (var organigram_id in Drupal.settings.organigram.organigrams) {
+          for (var organigram_id in Drupal.settings.organigrams.organigrams) {
             // Retrieve the callback function.
-            var organigram_data = Drupal.settings.organigram.organigrams[organigram_id];
+            var organigram_data = Drupal.settings.organigrams.organigrams[organigram_id];
             // Loading the organigram chart happens in three phases.
             // 1. Hide content and perform additional preload logic.
             organigramPreLoad(organigram_id);
@@ -205,8 +205,8 @@
        * Check if the specified organigram setting is present.
        */
       function organigramSettingExists(name) {
-        return Drupal.settings.organigram != null &&
-          Drupal.settings.organigram[name] != null;
+        return Drupal.settings.organigrams != null &&
+          Drupal.settings.organigrams[name] != null;
       }
 
       /**
