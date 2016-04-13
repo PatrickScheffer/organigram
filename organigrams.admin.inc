@@ -55,7 +55,7 @@ function organigrams_form_overview_organigrams($form) {
     $organigram_element['view'] = array(
       '#type' => 'link',
       '#title' => t('view'),
-      '#href' => "organigrams/{$organigram->machine_name}",
+      '#href' => "organigram/{$organigram->machine_name}",
     );
 
     $organigram_element['add'] = array(

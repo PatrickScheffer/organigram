@@ -413,17 +413,17 @@ function organigrams_field_extra_fields() {
             'weight' => -4,
           ),
           'organigram_settings' => array(
-            'label' => t('organigram settings'),
+            'label' => t('Organigram settings'),
             'description' => t('Fieldgroup'),
             'weight' => -3,
           ),
           'item_settings' => array(
-            'label' => t('organigram item settings'),
+            'label' => t('Organigram item settings'),
             'description' => t('Fieldgroup'),
             'weight' => -2,
           ),
           'font_settings' => array(
-            'label' => t('organigram font settings'),
+            'label' => t('Organigram font settings'),
             'description' => t('Fieldgroup'),
             'weight' => -1,
           ),
@@ -457,11 +457,11 @@ function organigrams_block_info() {
   // Initialize blocks array.
   $blocks = array();
   // Iterate through all the available organigrams.
-  foreach (organigrams_get_names() as $machine_name => $organigrams) {
+  foreach (organigrams_get_names() as $machine_name => $organigram) {
     // Add organigram block.
-    $blocks[$organigrams->oid] = array(
-      'info' => t('organigram: !organigram', array(
-        '!organigram' => $organigrams->name,
+    $blocks[$organigram->oid] = array(
+      'info' => t('Organigram: !organigram', array(
+        '!organigram' => $organigram->name,
       )),
     );
   }
