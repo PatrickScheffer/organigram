@@ -131,7 +131,8 @@ var G_vmlCanvasManager;
 // IE has no console.log.
 if (!window.console) {
   console = {
-    log: function() {}
+    log: function() {
+    }
   };
 }
 
@@ -424,7 +425,7 @@ function orgChart() {
   };
 
   orgChart.prototype.drawChart = function (id, width, height, align) {
-    // siblings may be added. Reset all positions first.
+    // Siblings may be added. Reset all positions first.
     var i;
     for (i = 0; i < nodes.length; i++) {
       nodes[i].hpos = -1;
@@ -594,19 +595,20 @@ function orgChart() {
       theCanvas.addEventListener("click", orgChartClick, false);
       theCanvas.addEventListener("mousemove", orgChartMouseMove, false);
       theCanvas.addEventListener("mouseout", orgChartResetCursor, false);
+    }
     // IE.
-    } else if (theCanvas.attachEvent) {
-      theCanvas.onclick = function () {
+    else if (theCanvas.attachEvent) {
+      theCanvas.onclick = function() {
         var mtarget = document.getElementById(id);
         orgChartClick(event, mtarget.scrollLeft, mtarget.scrollTop - 20);
       };
 
-      theCanvas.onmousemove = function () {
+      theCanvas.onmousemove = function() {
         var mtarget = document.getElementById(id);
         orgChartMouseMove(event, mtarget.scrollLeft, mtarget.scrollTop - 20);
       };
 
-      theCanvas.onmouseout = function () {
+      theCanvas.onmouseout = function() {
         orgChartResetCursor();
       };
     }
@@ -627,19 +629,22 @@ function orgChart() {
 
     if (document.documentElement && document.documentElement.scrollLeft) {
       x += document.documentElement.scrollLeft;
-    } else {
+    }
+    else {
       x += document.body.scrollLeft;
     }
     if (document.documentElement && document.documentElement.scrollTop) {
       y += document.documentElement.scrollTop;
-    } else {
+    }
+    else {
       y += document.body.scrollTop;
     }
 
     i = getNodeAt(x, y);
     if (i >= 0 && nodes[i].url.length > 0) {
       document.body.style.cursor = 'pointer';
-    } else {
+    }
+    else {
       document.body.style.cursor = 'default';
     }
   };
@@ -660,7 +665,7 @@ function orgChart() {
     var x, y, i, i1, i2, d;
 
     if (event.button < 0 || event.button > 1) {
-      // left button (w3c: 0, IE: 1) only.
+      // Left button (w3c: 0, IE: 1) only.
       return;
     }
 
@@ -672,12 +677,14 @@ function orgChart() {
 
     if (document.documentElement && document.documentElement.scrollLeft) {
       x += document.documentElement.scrollLeft;
-    } else {
+    }
+    else {
       x += document.body.scrollLeft;
     }
     if (document.documentElement && document.documentElement.scrollTop) {
       y += document.documentElement.scrollTop;
-    } else {
+    }
+    else {
       y += document.body.scrollTop;
     }
 
@@ -689,7 +696,8 @@ function orgChart() {
         i2 = nodes[i].url.indexOf('/');
         if (i1 >= 0 && i2 > i1) {
           window.open(nodes[i].url);
-        } else {
+        }
+        else {
           window.location = nodes[i].url;
         }
       }
@@ -788,7 +796,8 @@ function orgChart() {
           break;
         }
       }
-    } else {
+    }
+    else {
       hShiftTree(p, w);
     }
 
@@ -893,10 +902,12 @@ function orgChart() {
               if (nodes[rs].hpos > nodes[p].hpos) {
                 w = nodes[p].hpos + boxWidth / 2 + hSpace - nodes[s].hpos;
                 hShiftTreeAndRBrothers(rs, w);
-              } else {
+              }
+              else {
                 hShiftTreeAndRBrothers(rp, w);
               }
-            } else {
+            }
+            else {
               debugOut("Overlap within the same subtree");
 
               branch = nodes[s].contype;
@@ -915,14 +926,17 @@ function orgChart() {
                   w = nodes[s].hpos + boxWidth + hSpace - (nodes[p].hpos + boxWidth / 2);
                   hShiftTreeAndRBrothers(p, w);
                   hShiftTree(tm, -w);
-                } else {
+                }
+                else {
                   w = (nodes[p].hpos + boxWidth / 2) - nodes[s].hpos + hSpace;
                   hShiftTreeAndRBrothers(tm, w);
                 }
-              } else {
+              }
+              else {
                 if (nodes[rp].hpos > nodes[rs].hpos) {
                   hShiftTree(rp, w);
-                } else {
+                }
+                else {
                   hShiftTree(rs, w);
                 }
               }
@@ -964,12 +978,14 @@ function orgChart() {
             uj = getRootNode(j);
             if (ui !== uj) {
               hShiftTreeAndRBrothers(uj, boxWidth + hSpace);
-            } else {
+            }
+            else {
               ui = getUParent(i);
               uj = getUParent(j);
               if (ui !== uj) {
                 hShiftTreeAndRBrothers(uj, boxWidth + hSpace);
-              } else {
+              }
+              else {
                 // In the right subtree, find the first 'u' or 'r' parent to
                 // shift.
                 uj = j;
@@ -978,7 +994,8 @@ function orgChart() {
                 }
                 if (nodes[uj].parent !== '') {
                   hShiftTreeAndRBrothers(uj, boxWidth + hSpace);
-                } else {
+                }
+                else {
                   debugOut("There is nothing I can do about this, sorry");
                 }
               }
@@ -1007,7 +1024,8 @@ function orgChart() {
             }
             if (nodes[i].hpos > nodes[j].hpos) {
               w = nodes[j].hpos - nodes[i].hpos + boxWidth + hSpace;
-            } else {
+            }
+            else {
               w = nodes[i].hpos - nodes[j].hpos + boxWidth + hSpace;
             }
             if (nodeUnderParent(i, ui) && nodeUnderParent(j, ui)) {
@@ -1018,14 +1036,16 @@ function orgChart() {
               if (j >= 0) {
                 hShiftTreeAndRBrothers(j, w);
               }
-            } else {
+            }
+            else {
               while (nodes[ui].parent !== '' && nodes[ui].contype === 'u' && nodes[nodes[ui].parentix].usib.length === 1) {
                 ui = nodes[ui].parentix;
               }
               hShiftTreeAndRBrothers(ui, w);
             }
             retry = 1;
-          } else {
+          }
+          else {
             hShiftTreeAndRBrothers(i, boxWidth / 2);
             retry = 1;
           }
@@ -1101,8 +1121,7 @@ function orgChart() {
       y = getLowestBox(p, "l") + boxHeight + vSpace;
       // Commented out this function because it added an unwanted spacing to all
       // left nodes.
-      //makeRoomForDownline(p, y);
-
+      // makeRoomForDownline(p, y);
       nodes[s].hpos = nodes[p].hpos - boxWidth / 2 - hShift;
       nodes[s].vpos = y;
       if (nodes[s].hpos < 0) {
@@ -1133,16 +1152,20 @@ function orgChart() {
           h = Math.abs(h);
           q = nodes[s].parentix;
           w = nodes[o].hpos + boxWidth + hSpace - nodes[s].hpos;
-          if (nodes[o].contype === 'l') w += hSpace;
+          if (nodes[o].contype === 'l') {
+            w += hSpace;
+          }
           while (q !== -1 && nodes[q].contype !== 'u') {
             q = nodes[q].parentix;
           }
           if (q < 0) {
             hShiftTree(p, w);
-          } else {
+          }
+          else {
             if (!nodeUnderParent(o, q)) {
               hShiftTreeAndRBrothers(q, w);
-            } else {
+            }
+            else {
               debugOut("Same parent, do not shift");
             }
           }
@@ -1184,17 +1207,20 @@ function orgChart() {
           }
           if (q < 0) {
             hShiftTree(p, boxWidth + hSpace - h);
-          } else {
+          }
+          else {
             us = getUParent(s);
             uo = getUParent(o);
             if (us === uo) {
               if (!nodeUnderParent(o, q)) {
                 hShiftTreeAndRBrothers(q, boxWidth + hSpace - h);
-              } else {
+              }
+              else {
                 // Shift parent if overlap with lsib of our parent.
                 debugOut("Same parent, do not shift");
               }
-            } else {
+            }
+            else {
               // Shift the common parent (if any) to the right, and the
               // uppermost parent of the existing o node back to the left.
               us = getRootNode(s);
@@ -1208,7 +1234,8 @@ function orgChart() {
                 }
                 debugOut("Highest not common u-parent = " + nodes[us].txt);
                 hShiftTreeAndRBrothers(us, w);
-              } else {
+              }
+              else {
                 hShiftTreeAndRBrothers(s, w);
               }
             }
@@ -1275,7 +1302,9 @@ function orgChart() {
       if (nodes[p].lsib.length > 0) {
         for (i = 0; i < nodes[p].lsib.length; i++) {
           x = findRightMost(nodes[p].lsib[i], v);
-          if (x > maxx) maxx = x;
+          if (x > maxx) {
+            maxx = x;
+          }
           debugOut("Left tree '" + nodes[nodes[p].lsib[i]].txt + "' has rightmost " + x);
         }
         maxx += boxWidth;
@@ -1285,7 +1314,8 @@ function orgChart() {
       // If there are right trees, spacing differs!
       if (nodes[p].rsib.length > 0) {
         w = maxx + hSpace / 2 - boxWidth / 2 - nodes[p].hpos;
-      } else {
+      }
+      else {
         w = maxx + hShift / 2 - boxWidth / 2 - nodes[p].hpos;
       }
       if (w > 0) {
@@ -1325,7 +1355,8 @@ function orgChart() {
           x2 = x2 + boxWidth / 2 - (n * boxWidth + (n - 1) * hSpace) / 2;
           if (x1 > x2) {
             x2 = x1;
-          } else {
+          }
+          else {
             x1 = x2;
           }
         }
@@ -1440,7 +1471,8 @@ function orgChart() {
       w = 0;
       if (centerParentOverCompleteTree) {
         w = (findRightMost(p) - nodes[p].hpos) / 2;
-      } else {
+      }
+      else {
         f = nodes[p].usib[0];
         s = nodes[p].usib[h - 1];
         w = nodes[f].hpos + (nodes[s].hpos - nodes[f].hpos) / 2 - nodes[p].hpos;
@@ -1467,8 +1499,12 @@ function orgChart() {
       for (q = 0; q < nodes.length; q++) {
         if (nodes[q].vpos === nodes[p].vpos && nodes[q].hpos > nodes[p].hpos) {
           maxw = nodes[q].hpos - nodes[p].hpos - boxWidth - hShift - hSpace;
-          if (maxw < 0) maxw = 0;
-          if (w > maxw) w = maxw;
+          if (maxw < 0) {
+            maxw = 0;
+          }
+          if (w > maxw) {
+            w = maxw;
+          }
         }
       }
       if (w > 1) {
@@ -1497,7 +1533,8 @@ function orgChart() {
 
     if (nodes[p].vpos <= maxv) {
       maxx = nodes[p].hpos;
-    } else {
+    }
+    else {
       maxx = -1;
     }
 
@@ -1534,7 +1571,8 @@ function orgChart() {
 
     if (nodes[p].vpos <= maxv) {
       minx = nodes[p].hpos;
-    } else {
+    }
+    else {
       minx = 999999;
     }
 
@@ -1633,13 +1671,21 @@ function orgChart() {
       ctx.beginPath();
       ctx.moveTo(x + toprad, y);
       ctx.lineTo(x + width - toprad, y);
-      if (toprad > 0) ctx.quadraticCurveTo(x + width, y, x + width, y + toprad);
+      if (toprad > 0) {
+        ctx.quadraticCurveTo(x + width, y, x + width, y + toprad);
+      }
       ctx.lineTo(x + width, y + height - botrad);
-      if (botrad > 0) ctx.quadraticCurveTo(x + width, y + height, x + width - botrad, y + height);
+      if (botrad > 0) {
+        ctx.quadraticCurveTo(x + width, y + height, x + width - botrad, y + height);
+      }
       ctx.lineTo(x + botrad, y + height);
-      if (botrad > 0) ctx.quadraticCurveTo(x, y + height, x, y + height - botrad);
+      if (botrad > 0) {
+        ctx.quadraticCurveTo(x, y + height, x, y + height - botrad);
+      }
       ctx.lineTo(x, y + toprad);
-      if (toprad > 0) ctx.quadraticCurveTo(x, y, x + toprad, y);
+      if (toprad > 0) {
+        ctx.quadraticCurveTo(x, y, x + toprad, y);
+      }
       ctx.closePath();
       ctx.fill();
       x -= shadowx;
@@ -1658,13 +1704,21 @@ function orgChart() {
     ctx.beginPath();
     ctx.moveTo(x + toprad, y);
     ctx.lineTo(x + width - toprad, y);
-    if (toprad > 0) ctx.quadraticCurveTo(x + width, y, x + width, y + toprad);
+    if (toprad > 0) {
+      ctx.quadraticCurveTo(x + width, y, x + width, y + toprad);
+    }
     ctx.lineTo(x + width, y + height - botrad);
-    if (botrad > 0) ctx.quadraticCurveTo(x + width, y + height, x + width - botrad, y + height);
+    if (botrad > 0) {
+      ctx.quadraticCurveTo(x + width, y + height, x + width - botrad, y + height);
+    }
     ctx.lineTo(x + botrad, y + height);
-    if (botrad > 0) ctx.quadraticCurveTo(x, y + height, x, y + height - botrad);
+    if (botrad > 0) {
+      ctx.quadraticCurveTo(x, y + height, x, y + height - botrad);
+    }
     ctx.lineTo(x, y + toprad);
-    if (toprad > 0) ctx.quadraticCurveTo(x, y, x + toprad, y);
+    if (toprad > 0) {
+      ctx.quadraticCurveTo(x, y, x + toprad, y);
+    }
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
@@ -1681,7 +1735,9 @@ function orgChart() {
         // Resize if image too height. If the imgrad is less than the linewidth
         // of the box, we need to draw inside the box.
         imgrad = 0.414 * (toprad + botrad);
-        if (imgrad < 1) imgrad = 1;
+        if (imgrad < 1) {
+          imgrad = 1;
+        }
 
         if (maxy > height - imgrad) {
           maxx = img.width * (height - imgrad) / img.height;
@@ -1690,19 +1746,25 @@ function orgChart() {
 
         // Resize if image too width, even after previous resize.
         maxrad = toprad;
-        if (botrad > maxrad) maxrad = botrad;
+        if (botrad > maxrad) {
+          maxrad = botrad;
+        }
         imgrad = 0.414 * maxrad;
         if (maxx > width - 2 * imgrad) {
           maxy = img.height * (width - 2 * imgrad) / img.width;
           maxx = width - 2 * imgrad;
         }
-      } else {
+      }
+      else {
         imgrad = 0.414 * (toprad + botrad);
-        if (imgrad < 1) imgrad = 1;
+        if (imgrad < 1) {
+          imgrad = 1;
+        }
 
         if (width > height) {
           maxy = height - 2 * imgrad;
-        } else {
+        }
+        else {
           maxy = width - 2 * imgrad;
         }
         maxx = maxy;
@@ -1710,18 +1772,27 @@ function orgChart() {
 
       // Horizontal offset.
       xPic = imgrad;
-      if (imgalign == 'c') xPic = (width - 2 * imgrad - maxx) / 2 + imgrad;
-      if (imgalign == 'r') xPic = width - maxx - imgrad;
+      if (imgalign == 'c') {
+        xPic = (width - 2 * imgrad - maxx) / 2 + imgrad;
+      }
+      if (imgalign == 'r') {
+        xPic = width - maxx - imgrad;
+      }
 
       // Vertical offset.
       yPic = 0.414 * toprad + 1;
-      if (imgvalign == 'm') yPic = (height - maxy) / 2;
-      if (imgvalign == 'b') yPic = height - maxy - (0.414 * botrad) - 1;
+      if (imgvalign == 'm') {
+        yPic = (height - maxy) / 2;
+      }
+      if (imgvalign == 'b') {
+        yPic = height - maxy - (0.414 * botrad) - 1;
+      }
 
       if (img.width > 0) {
         ctx.drawImage(img, x + xPic, y + yPic, maxx, maxy);
         nodes[i].imgDrawn = 1;
-      } else {
+      }
+      else {
         // Draw an image-not-found picture.
         if (maxy > 0) {
           ctx.beginPath();
@@ -1754,7 +1825,8 @@ function orgChart() {
           if ((width - maxx) * height > width * (height - maxy)) {
             x += (xPic + maxx);
             width -= (xPic + maxx);
-          } else {
+          }
+          else {
             y += (yPic + maxy);
             height -= (yPic + maxy);
           }
@@ -1767,7 +1839,8 @@ function orgChart() {
           if ((width - maxx) * height > width * (height - maxy)) {
             x += (xPic + maxx);
             width -= (xPic + maxx);
-          } else {
+          }
+          else {
             height -= (yPic + maxy);
           }
         }
@@ -1781,7 +1854,8 @@ function orgChart() {
           if (width - maxx > height - maxy) {
             x += (xPic + maxx);
             width -= (xPic + maxx);
-          } else {
+          }
+          else {
             y += (yPic + maxy);
             height -= (yPic + maxy);
           }
@@ -1794,7 +1868,8 @@ function orgChart() {
         if (imgvalign == 't') {
           if ((width - maxx) * height > width * (height - maxy)) {
             width = xPic;
-          } else {
+          }
+          else {
             y += (yPic + maxy);
             height -= (yPic + maxy);
           }
@@ -1805,7 +1880,8 @@ function orgChart() {
         if (imgvalign == 'b') {
           if ((width - maxx) * height > width * (height - maxy)) {
             width = xPic;
-          } else {
+          }
+          else {
             height -= (yPic + maxy);
           }
         }
@@ -1838,8 +1914,11 @@ function orgChart() {
       if (t1.length < txt.length) {
         txt = txt.substr(t1.length);
         // Remove [br] from the text.
-        if (nl >= 0) txt = txt.substr(4);
-      } else {
+        if (nl >= 0) {
+          txt = txt.substr(4);
+        }
+      }
+      else {
         txt = "";
       }
     }
@@ -1883,8 +1962,6 @@ function orgChart() {
       ctx.fillText(tlines[i], x + width / 2, y + yp);
       yp += parseInt(fsize, 10);
     }
-
-    //ctx.restore();
   };
 
   drawConLines = function (ctx) {
@@ -2022,7 +2099,8 @@ function orgChart() {
       r = nodes[p].rsib[r - 1];
       if (nodes[l].vpos > nodes[r].vpos) {
         f = l;
-      } else {
+      }
+      else {
         f = r;
       }
     }
@@ -2241,7 +2319,8 @@ function orgChart() {
         curleft += obj.offsetLeft;
         obj = obj.offsetParent;
       } while (obj);
-    } else {
+    }
+    else {
       if (obj.x) {
         curleft += obj.x;
       }
@@ -2258,7 +2337,8 @@ function orgChart() {
         curtop += obj.offsetTop;
         obj = obj.offsetParent;
       } while (obj);
-    } else {
+    }
+    else {
       if (obj.y) {
         curtop += obj.y;
       }
