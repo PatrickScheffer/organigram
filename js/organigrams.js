@@ -10,10 +10,12 @@
 
       var redrawOnResize = {};
 
-      /**
-       * IE8 fix.
-       */
       if (!Object.keys) {
+        /**
+         * IE8 fix.
+         * @param {Object} obj
+         * @returns {Array}
+         */
         Object.keys = function (obj) {
           var keys = [];
 
@@ -34,7 +36,8 @@
        * Load all the registered organigrams.
        */
       function organigramLoader() {
-        var organigram_id, organigram_data;
+        var organigram_id;
+        var organigram_data;
 
         // Are there organigrams that need processing?
         if (organigramSettingExists('organigrams')) {
@@ -58,6 +61,7 @@
 
       /**
        * Prepare the DOM model for the javascript organigram chart.
+       *
        * @param {string} organigram_id - Unique organigram hash.
        */
       function organigramPreLoad(organigram_id) {
@@ -75,25 +79,27 @@
 
       /**
        * Extract node data from organigram list items.
+       *
        * @param {string} organigram_id - Unique organigram hash.
+       *
        * @return {Array} - Array with node objects.
        */
       function organigramExtractNodes(organigram_id) {
         var i, organigram_items;
         var nodes = [];
         var attributes = [
-            'id',
-            'parent',
-            'position',
-            'text',
-            'bold',
-            'url',
-            'border_color',
-            'background_color',
-            'font_color',
-            'image_url',
-            'image_alignment'
-          ];
+          'id',
+          'parent',
+          'position',
+          'text',
+          'bold',
+          'url',
+          'border_color',
+          'background_color',
+          'font_color',
+          'image_url',
+          'image_alignment'
+        ];
 
         // Retrieve all li items in the organigram items container.
         organigram_items = $('div.organigram-items#organigram-items-' + organigram_id).find('li');
@@ -105,7 +111,9 @@
             // Add a node with all attributes specified in the attributes array.
             nodes[index] = {};
             for (i in attributes) {
-              nodes[index][attributes[i]] = $(li).attr(attributes[i]);
+              if (attributes.hasOwnProperty(i)) {
+                nodes[index][attributes[i]] = $(li).attr(attributes[i]);
+              }
             }
           });
         }
@@ -115,6 +123,7 @@
 
       /**
        * Load the organigram chart.
+       *
        * @param {string} organigram_id - Unique organigram hash.
        * @param {Array} organigram_data - Contains organigram settings and nodes.
        */
@@ -129,9 +138,13 @@
           var organigram_width = 'parent';
           var organigram_height = 'auto';
           var organigram_position = 'left';
+          var color_property_keys = [];
           var color_properties = {};
+          var font_property_keys = [];
           var font_properties = {};
+          var size_property_keys = [];
           var size_properties = {};
+          var node_property_keys = [];
           var node_properties = {};
           var o = new orgChart();
 
@@ -160,61 +173,63 @@
             }
 
             // Set the color properties.
-            color_properties = {
-              border_color: undefined,
-              background_color: undefined,
-              font_color: undefined,
-              line_color: undefined
-            };
-            color_properties = organigramGetProperties(color_properties, organigram_data);
+            color_property_keys = [
+              'border_color',
+              'background_color',
+              'font_color',
+              'line_color'
+            ];
+            color_properties = organigramGetProperties(color_property_keys, organigram_data);
             o.setColor(color_properties.border_color, color_properties.background_color, color_properties.font_color, color_properties.line_color);
 
             // Set the font properties.
-            font_properties = {
-              font_name: undefined,
-              font_size: undefined,
-              font_color: undefined,
-              vertical_alignment: undefined
-            };
-            font_properties = organigramGetProperties(font_properties, organigram_data);
+            font_property_keys = [
+              'font_name',
+              'font_size',
+              'font_color',
+              'vertical_alignment'
+            ];
+            font_properties = organigramGetProperties(font_property_keys, organigram_data);
             o.setFont(font_properties.font_name, font_properties.font_size, font_properties.font_color, font_properties.vertical_alignment);
 
             // Set the size properties.
-            size_properties = {
-              node_width: undefined,
-              node_height: undefined,
-              horizontal_space: undefined,
-              vertical_space: undefined,
-              horizontal_offset: undefined
-            };
-            size_properties = organigramGetProperties(size_properties, organigram_data);
+            size_property_keys = [
+              'node_width',
+              'node_height',
+              'horizontal_space',
+              'vertical_space',
+              'horizontal_offset'
+            ];
+            size_properties = organigramGetProperties(size_property_keys, organigram_data);
             o.setSize(size_properties.node_width, size_properties.node_height, size_properties.horizontal_space, size_properties.vertical_space, size_properties.horizontal_offset);
 
             // Set the node style properties.
-            node_properties = {
-              top_radius: undefined,
-              bottom_radius: undefined,
-              shadow_offset: undefined
-            };
-            node_properties = organigramGetProperties(node_properties, organigram_data);
+            node_property_keys = [
+              'top_radius',
+              'bottom_radius',
+              'shadow_offset'
+            ];
+            node_properties = organigramGetProperties(node_property_keys, organigram_data);
             o.setNodeStyle(node_properties.top_radius, node_properties.bottom_radius, node_properties.shadow_offset);
           }
 
           // Iterate through the nodes.
           for (i in organigram_data['nodes']) {
-            o.addNode(
-              organigram_data['nodes'][i].id,
-              organigram_data['nodes'][i].parent,
-              organigram_data['nodes'][i].position,
-              organigram_data['nodes'][i].text,
-              organigram_data['nodes'][i].bold == 0 ? undefined : 1,
-              organigram_data['nodes'][i].url,
-              organigram_data['nodes'][i].border_color,
-              organigram_data['nodes'][i].background_color,
-              organigram_data['nodes'][i].font_color,
-              organigram_data['nodes'][i].image_url.length > 0 ? organigram_data['nodes'][i].image_url : undefined,
-              organigram_data['nodes'][i].image_alignment
-            );
+            if (organigram_data['nodes'].hasOwnProperty(i)) {
+              o.addNode(
+                organigram_data['nodes'][i].id,
+                organigram_data['nodes'][i].parent,
+                organigram_data['nodes'][i].position,
+                organigram_data['nodes'][i].text,
+                organigram_data['nodes'][i].bold == 0 ? undefined : 1,
+                organigram_data['nodes'][i].url,
+                organigram_data['nodes'][i].border_color,
+                organigram_data['nodes'][i].background_color,
+                organigram_data['nodes'][i].font_color,
+                organigram_data['nodes'][i].image_url.length > 0 ? organigram_data['nodes'][i].image_url : undefined,
+                organigram_data['nodes'][i].image_alignment
+              );
+            }
           }
 
           // Draw the organigram.
@@ -224,31 +239,37 @@
 
       /**
        * Check if the specified organigram setting is present.
+       *
        * @param {string} name - The name of an organigram.
+       *
        * @return {boolean} - Indicating if the organigram exists.
        */
       function organigramSettingExists(name) {
-        return Drupal.settings.organigrams != null &&
-          Drupal.settings.organigrams[name] != null;
+        return Drupal.settings.organigrams !== null &&
+          Drupal.settings.organigrams[name] !== null;
       }
 
       /**
        * Replace properties in the given array with data from the organigram_data.
-       * @param {Array} properties - Array with keys to look for in the organigram_data array.
+       *
+       * @param {Array} property_keys - Array with keys to look for in the organigram_data array.
        * @param {Array} organigram_data - Array with all organigram data.
-       * @return {Array} - The same properties array but with values from the organigram_data array.
+       *
+       * @return {Object} - An object with the properties set in the property_keys.
        */
-      function organigramGetProperties(properties, organigram_data) {
-        for (var i in properties) {
-          if (!properties.hasOwnProperty(i)) {
+      function organigramGetProperties(property_keys, organigram_data) {
+        var properties = {};
+
+        for (var i in property_keys) {
+          if (!property_keys.hasOwnProperty(i)) {
             continue;
           }
 
-          if (typeof organigram_data['organigram_settings'][i] !== 'undefined' && organigram_data['organigram_settings'][i].length > 0) {
-            properties[i] = organigram_data['organigram_settings'][i];
+          if (typeof organigram_data['organigram_settings'][property_keys[i]] !== 'undefined' && organigram_data['organigram_settings'][property_keys[i]].length > 0) {
+            properties[property_keys[i]] = organigram_data['organigram_settings'][property_keys[i]];
             // Make sure an integer is an integer.
-            if (!isNaN(parseInt(properties[i]))) {
-              properties[i] = parseInt(properties[i]);
+            if (!isNaN(parseInt(properties[property_keys[i]]))) {
+              properties[property_keys[i]] = parseInt(properties[property_keys[i]]);
             }
           }
         }
