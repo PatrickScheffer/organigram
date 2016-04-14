@@ -1,11 +1,12 @@
 /**
  * @file
- * OrgChart Library
- * Version 1.14
+ * OrgChart Library v1.14
  *
  * Original version: 1.13 by J. van Loenen found here:
  * https://jvloenen.home.xs4all.nl/orgchart/sample.htm
- *
+ */
+
+/**
  * Interface:
  *
  *          +----------
@@ -22,93 +23,93 @@
  *
  * setSize(width, height, hspace, vspace, hshift)
  *   Generic setting, all boxes will have the same size.
- *	 - width	box width in pixels (optional)
- *	 - height	box height in pixels (optional)
- *	 - hspace	horizontal space between boxes (optional)
- *	 - vspace	vertical space between boxes (optional)
- *	 - hshift	horizontal shift for 'l' and 'r' boxes (optional)
+ *   - width   box width in pixels (optional)
+ *   - height  box height in pixels (optional)
+ *   - hspace  horizontal space between boxes (optional)
+ *   - vspace  vertical space between boxes (optional)
+ *   - hshift  horizontal shift for 'l' and 'r' boxes (optional)
  *
  * setNodeStyle(toprad, botrad, shadow)
  *   Set the corner style and shade for all node from now on
- *	 - toprad	The radius of the corners on the top. 0 for square boxes. Default
- *	   value is 5.
- *	 - botrad	The radius of the corners on the bottom. 0 for square boxes.
- *	   Default value is 5.
- *	 - shadow	Offset of the shadow. 0 for no shadow. Default value is 3.
- *		 No negative values for this function
+ *   - toprad  The radius of the corners on the top. 0 for square boxes. Default
+ *             value is 5.
+ *   - botrad  The radius of the corners on the bottom. 0 for square boxes.
+ *             Default value is 5.
+ *   - shadow  Offset of the shadow. 0 for no shadow. Default value is 3.
+ *             No negative values for this function
  *
  * setFont(fname, size, color, valign)
- *	 Set the font for nodes from now on
- *	 - fname	font name (eq. "arial")
- *	 - size	font size (in pixels, eg "12")
- *	 - color	rgb font color (optional, not changed if omitted)
- *	 - valign	Vertical alignment on/off (optional, not changed if omitted)
+ *   Set the font for nodes from now on
+ *   - fname  font name (eq. "arial")
+ *   - size   font size (in pixels, eg "12")
+ *   - color  rgb font color (optional, not changed if omitted)
+ *   - valign Vertical alignment on/off (optional, not changed if omitted)
  *
  * setColor(bline, bfill, btext, cline)
- *	 Set the colors for the nodes from now on
- *	 - bline	rgb line color for the boxes (optional, not changed if omitted)
- *	 - bfill	rgb fill color for the boxes (optional, not changed if omitted)
- *	 - btext	rgb font color for the boxes (optional, not changed if omitted)
- *	 - cline	rgb line color for the connection lines (optional, not changed if
- *	   omitted)
+ *   Set the colors for the nodes from now on
+ *   - bline  rgb line color for the boxes (optional, not changed if omitted)
+ *   - bfill  rgb fill color for the boxes (optional, not changed if omitted)
+ *   - btext  rgb font color for the boxes (optional, not changed if omitted)
+ *   - cline  rgb line color for the connection lines (optional, not changed if
+ *     omitted)
  *
  * addNode(id, parent, ctype, text, bold, url, cline, cfill, ctext, image, imgalign)
- *	 Add a node to the chart
- *	 - id	unique id of this node (required)
- *	 - parent	id of the parent node (-1 for no parent)
- *	 - ctype	connection type to the parent ('u' for under, 'l' for left, 'r'
- *	   for right)
- *	 - text	the text for the box (optional, none if omitted)
- *	 - bold	bold lines for this box (optional, no bold if omitted)
- *	 - url	a link attached to the box (optional, none if omitted)
- *	 - cline	rgb line color (optional, default value will be used if omitted)
- *	 - cfill	rgb fill color (optional, default value will be used if omitted)
- *	 - ctext	rgb font color (optional, default value will be used if omitted)
- *	 - image	optional image
- *	 - align	image alignment L(eft), C(enter), R(ight) + T(op), M(iddle)
- *	   B(ottom)
+ *   Add a node to the chart
+ *   - id     unique id of this node (required)
+ *   - parent id of the parent node (-1 for no parent)
+ *   - ctype  connection type to the parent ('u' for under, 'l' for left, 'r'
+ *            for right)
+ *   - text   the text for the box (optional, none if omitted)
+ *   - bold   bold lines for this box (optional, no bold if omitted)
+ *   - url    a link attached to the box (optional, none if omitted)
+ *   - cline  rgb line color (optional, default value will be used if omitted)
+ *   - cfill  rgb fill color (optional, default value will be used if omitted)
+ *   - ctext  rgb font color (optional, default value will be used if omitted)
+ *   - image  optional image
+ *   - align  image alignment L(eft), C(enter), R(ight) + T(op), M(iddle)
+ *            B(ottom)
  *
  * drawChart(id, width, height, align)
- *	 Draws the chart on the canvas
- *	 - id	id of the canvas
- *   - width integer in pixels for a static with, auto for automatic calculation
- *     and parent to use the container element's with.
- *	 - align	'c' of 'center' for horizontal alignment on the canvas (left
- *	   alignment if omitted)
+ *   Draws the chart on the canvas
+ *   - id     id of the canvas
+ *   - width  integer in pixels for a static with, auto for automatic calculation
+ *            and parent to use the container element's with.
+ *   - align  'c' of 'center' for horizontal alignment on the canvas (left
+ *            alignment if omitted)
  *
  * redrawChart(id)
- *	 Re-draws the in-memory chart on the canvas (Resizing a canvas clears the
- *	 content).
- *	 - id	id of the canvas
+ *   Re-draws the in-memory chart on the canvas (Resizing a canvas clears the
+ *   content).
+ *   - id  id of the canvas
  *
  * setDebug(value)
- *	 Sets the global debug mode
- *	 - value	1 for on, 0 for off
+ *   Sets the global debug mode
+ *   - value  1 for on, 0 for off
  *
  * eg. var MyChart = new orgChart();
  *
  * Change history:
  * ===============
  * J. van Loenen
- * 2013-02-23	New: Lines breaks on \n sequences.
+ * 2013-02-23 New: Lines breaks on \n sequences.
  * 2013-02-28 New: redrawChart().
- * 2013-03-12	New: drawChart() will reset first: you can add/move nodes and
+ * 2013-03-12 New: drawChart() will reset first: you can add/move nodes and
  *            redraw on an existing chart.
- * 2013-03-13	New: drawChart - Fit argument.
- * 2013-04-19	Fixed: Event coordinates in IE.
- * 2013-08-23	New: Images on nodes.
- * 2013-10-21	Fixed: Shift bugs on multiple left/right-nodes.
- * 2013-10-21	New: Retina support.
- * 2013-10-23	Fixed: Textbreaks didn't split correctly sometimes.
- * 2013-11-07	Fixed: Center-parent bug if no room and only one usib.
- * 2013-11-07	Fixed: Shift bug on a single u-node fixed.
- * 2013-11-21	Fixed: Several placement bugs.
- * 2013-11-22	New: setNodeStyle().
- * 2014-01-09	Fixed: Line bug if low node defined first and other have only left
+ * 2013-03-13 New: drawChart - Fit argument.
+ * 2013-04-19 Fixed: Event coordinates in IE.
+ * 2013-08-23 New: Images on nodes.
+ * 2013-10-21 Fixed: Shift bugs on multiple left/right-nodes.
+ * 2013-10-21 New: Retina support.
+ * 2013-10-23 Fixed: Textbreaks didn't split correctly sometimes.
+ * 2013-11-07 Fixed: Center-parent bug if no room and only one usib.
+ * 2013-11-07 Fixed: Shift bug on a single u-node fixed.
+ * 2013-11-21 Fixed: Several placement bugs.
+ * 2013-11-22 New: setNodeStyle().
+ * 2014-01-09 Fixed: Line bug if low node defined first and other have only left
  *            or right siblings.
- * 2014-01-09	Fixed: Image-not-found images wrong placed.
- * 2015-11-20	Fixed: Overlapping nodes on using r-siblings only.
- * 2015-11-23	Fixed: Wrong positioning on some complex examples.
+ * 2014-01-09 Fixed: Image-not-found images wrong placed.
+ * 2015-11-20 Fixed: Overlapping nodes on using r-siblings only.
+ * 2015-11-23 Fixed: Wrong positioning on some complex examples.
  *
  * P. Scheffer
  * 2016-04-07 New: Added options to set width and height of the organigram.
@@ -124,12 +125,12 @@
  * 2016-04-13 Fixed: Cursor stays pointer when moving to fast off canvas.
  */
 
-var G_vmlCanvasManager;	// so non-IE won't freak out
+var G_vmlCanvasManager;  // so non-IE won't freak out
 
 if (!window.console) console = {
   log: function () {
   }
-};	// IE has no console.log
+};  // IE has no console.log
 
 function orgChart() {
 
@@ -139,18 +140,18 @@ function orgChart() {
 // Default values:
 ///////////////////
 
-  var lineColor = "#3388DD",		// Color of the connection lines (global for all lines)
-    boxWidth = 120,			// Box width (global for all boxes)
-    boxHeight = 30,			// Box height (global for all boxes)
-    hSpace = 20,			// Horizontal space in between the boxes (global for all boxes)
-    vSpace = 20,			// Vertical space in between the boxes (global for all boxes)
-    hShift = 30,			// The number of pixels vertical siblings are shifted (global for all boxes)
-    boxLineColor = "#B5D9EA",	// Default box line color
-    boxFillColor = "#CFE8EF",	// Default box fill color
-    textColor = "#000000",		// Default box text color
-    textFont = "arial",		// Default font
-    textSize = 12,			// Default text size (pixels, not points)
-    textVAlign = 1,			// Default text alignment
+  var lineColor = "#3388DD",    // Color of the connection lines (global for all lines)
+    boxWidth = 120,      // Box width (global for all boxes)
+    boxHeight = 30,      // Box height (global for all boxes)
+    hSpace = 20,      // Horizontal space in between the boxes (global for all boxes)
+    vSpace = 20,      // Vertical space in between the boxes (global for all boxes)
+    hShift = 30,      // The number of pixels vertical siblings are shifted (global for all boxes)
+    boxLineColor = "#B5D9EA",  // Default box line color
+    boxFillColor = "#CFE8EF",  // Default box fill color
+    textColor = "#000000",    // Default box text color
+    textFont = "arial",    // Default font
+    textSize = 12,      // Default text size (pixels, not points)
+    textVAlign = 1,      // Default text alignment
 
     curshadowOffsetX = 3,
     curshadowOffsetY = 3,
@@ -159,7 +160,7 @@ function orgChart() {
     curbotradius = 5,
     nodes = [],
     theCanvas,
-    centerParentOverCompleteTree = 0,	// Experimental, lines may loose connections
+    centerParentOverCompleteTree = 0,  // Experimental, lines may loose connections
     debug = 0,
     maxLoop = 9,
     noalerts = 0,
@@ -218,27 +219,27 @@ function orgChart() {
 ////////////////////////////////////
 
   var Node = function (id, parent, contype, txt, bold, url, linecolor, fillcolor, textcolor, imgalign, imgvalign) {
-    this.id = id;			// User defined id
-    this.parent = parent;		// Parent id, user defined
-    this.parentix = -1;		// Parent index in the nodes array, -1 for no parent
-    this.contype = contype;		// 'u', 'l', 'r'
-    this.txt = txt;			// Text for the box
-    this.bold = bold;		// 1 for bold, 0 if not
-    this.url = url;			// url
+    this.id = id;      // User defined id
+    this.parent = parent;    // Parent id, user defined
+    this.parentix = -1;    // Parent index in the nodes array, -1 for no parent
+    this.contype = contype;    // 'u', 'l', 'r'
+    this.txt = txt;      // Text for the box
+    this.bold = bold;    // 1 for bold, 0 if not
+    this.url = url;      // url
     this.linecolor = linecolor;
     this.fillcolor = fillcolor;
     this.textcolor = textcolor;
     this.textfont = textFont;
     this.textsize = textSize;
     this.valign = textVAlign;
-    this.hpos = -1;			// Horizontal starting position in pixels
-    this.vpos = -1;			// Vertical starting position in pixels
-    this.usib = [];			// 'u' siblings
-    this.rsib = [];			// 'r' siblings
-    this.lsib = [];			// 'l' siblings
-    this.img = '';			// Optional image
-    this.imgAlign = imgalign;	// Image alignment 'l', 'c', 'r'
-    this.imgVAlign = imgvalign;	// Image vertical alignment 't', 'm', 'b'
+    this.hpos = -1;      // Horizontal starting position in pixels
+    this.vpos = -1;      // Vertical starting position in pixels
+    this.usib = [];      // 'u' siblings
+    this.rsib = [];      // 'r' siblings
+    this.lsib = [];      // 'l' siblings
+    this.img = '';      // Optional image
+    this.imgAlign = imgalign;  // Image alignment 'l', 'c', 'r'
+    this.imgVAlign = imgvalign;  // Image vertical alignment 't', 'm', 'b'
     this.imgDrawn = 0;
     this.topradius = curtopradius;
     this.botradius = curbotradius;
@@ -369,7 +370,7 @@ function orgChart() {
     if (imgalign.substr(1, 1) == 't' || imgalign.substr(1, 1) == 'T') imgvalign = 't';
     if (imgalign.substr(1, 1) == 'b' || imgalign.substr(1, 1) == 'B') imgvalign = 'b';
     if (imgalign.substr(0, 1) == 'c' || imgalign.substr(0, 1) == 'C') imgalign = 'c';
-    if (imgalign.substr(0, 1) == 'm' || imgalign.substr(0, 1) == 'M') imgalign = 'c';	// Service!
+    if (imgalign.substr(0, 1) == 'm' || imgalign.substr(0, 1) == 'M') imgalign = 'c';  // Service!
     if (imgalign.substr(0, 1) == 'r' || imgalign.substr(0, 1) == 'R') imgalign = 'r';
     if (imgalign != 'c' && imgalign != 'r') imgalign = 'l';
 
@@ -556,7 +557,7 @@ function orgChart() {
 
     // Add click behaviour:
     if (theCanvas.addEventListener) {
-      theCanvas.removeEventListener("click", orgChartClick, false);	// If any old on this canvas, remove it
+      theCanvas.removeEventListener("click", orgChartClick, false);  // If any old on this canvas, remove it
       theCanvas.addEventListener("click", orgChartClick, false);
       theCanvas.addEventListener("mousemove", orgChartMouseMove, false);
       theCanvas.addEventListener("mouseout", orgChartResetCursor, false);
@@ -613,7 +614,7 @@ function orgChart() {
     var x, y, i, i1, i2, d;
 
     if (event.button < 0 || event.button > 1) {
-      return;	// left button (w3c: 0, IE: 1) only
+      return;  // left button (w3c: 0, IE: 1) only
     }
 
     x = event.clientX;
@@ -1018,7 +1019,7 @@ function orgChart() {
         nodes[i].vpos = y + nodes[i].shadowOffsetY;
         positionTree(i, x, x);
         // hpos can be changed during positionTree:
-        x = findRightMost(i) + boxWidth;	// Start for next tree
+        x = findRightMost(i) + boxWidth;  // Start for next tree
       }
     }
   };
@@ -1078,7 +1079,7 @@ function orgChart() {
             hShiftTree(p, w);
           } else {
             if (!nodeUnderParent(o, q)) {
-              hShiftTreeAndRBrothers(q, w);	// ! 2*w, dd 2013-10-21
+              hShiftTreeAndRBrothers(q, w);  // ! 2*w, dd 2013-10-21
             } else {
               debugOut("Same parent, do not shift");
             }
@@ -1254,8 +1255,8 @@ function orgChart() {
           x1 = x2;
         }
         if (h >= 0 && nodes[h].hpos + boxWidth + hSpace < x1) {
-          x1 = nodes[h].hpos + boxWidth + hSpace;				// minimum x
-          x2 = x2 + boxWidth / 2 - (n * boxWidth + (n - 1) * hSpace) / 2;	// wanted
+          x1 = nodes[h].hpos + boxWidth + hSpace;        // minimum x
+          x2 = x2 + boxWidth / 2 - (n * boxWidth + (n - 1) * hSpace) / 2;  // wanted
           if (x1 > x2) {
             x2 = x1;
           } else {
@@ -1742,7 +1743,7 @@ function orgChart() {
     //ctx.save();
     //ctx.clip(); will clip on "image-not-found" now
 
-    var tlines = [];	// Split text in multiple lines if it doesn't fit
+    var tlines = [];  // Split text in multiple lines if it doesn't fit
     var n = 0;
     var t1;
     var nl;
@@ -1764,7 +1765,7 @@ function orgChart() {
       n++;
       if (t1.length < txt.length) {
         txt = txt.substr(t1.length);
-        if (nl >= 0) txt = txt.substr(4);	// Remove [br] from the text.
+        if (nl >= 0) txt = txt.substr(4);  // Remove [br] from the text.
       } else {
         txt = "";
       }
