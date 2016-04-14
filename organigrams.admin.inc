@@ -7,7 +7,7 @@
 /**
  * List all organigrams form.
  *
- * @param $form
+ * @param array $form
  *   Contains form elements.
  *
  * @return array
@@ -93,11 +93,11 @@ function organigrams_form_overview_organigrams($form) {
 /**
  * Create or edit an organigram form.
  *
- * @param $form
+ * @param array $form
  *   The form being used to edit the node.
- * @param $form_state
+ * @param array $form_state
  *   The form state array.
- * @param $edit
+ * @param array $edit
  *   The object to update.
  *
  * @return mixed
@@ -365,11 +365,11 @@ function organigrams_form_organigrams($form, &$form_state, $edit = array()) {
 /**
  * Confirm organigram deletion form.
  *
- * @param $form
+ * @param array $form
  *   The form being used to edit the node.
- * @param $form_state
+ * @param array $form_state
  *   The form state array.
- * @param $organigram
+ * @param object $organigram
  *   The object to delete.
  *
  * @return mixed
@@ -391,10 +391,6 @@ function organigrams_form_confirm_delete_organigrams($form, &$form_state, $organ
       t('Cancel')
   );
 }
-
-/*
- * Form validation handlers.
- */
 
 /**
  * Form validation handler for 'organigrams_form_organigrams'.

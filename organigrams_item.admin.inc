@@ -7,7 +7,7 @@
 /**
  * Callback to redirect back to the organigrams item list overview.
  *
- * @param $organigrams_machine_name
+ * @param string $organigrams_machine_name
  *   An organigrams machine name.
  */
 function organigrams_redirect_to_organigrams_item_overview($organigrams_machine_name) {
@@ -17,11 +17,11 @@ function organigrams_redirect_to_organigrams_item_overview($organigrams_machine_
 /**
  * Generates a form overview of all organigrams items.
  *
- * @param $form
+ * @param array $form
  *   The form being used to edit the node.
- * @param $form_state
+ * @param array $form_state
  *   The form state array.
- * @param $organigram
+ * @param object $organigram
  *   An organigrams entity.
  *
  * @return mixed
@@ -87,12 +87,14 @@ function organigrams_form_overview_organigrams_items($form, &$form_state, $organ
 /**
  * Create or edit form for an organigrams item.
  *
- * @param $form
+ * @param array $form
  *   The form being used to edit the node.
- * @param $form_state
+ * @param array $form_state
  *   The form state array.
- * @param $organigram
+ * @param array $edit
  *   The object to edit.
+ * @param mixed $organigram
+ *   The parent organigram entity.
  *
  * @return mixed
  *   Renderable array containing a form.
@@ -167,7 +169,7 @@ function organigrams_form_organigrams_item($form, &$form_state, $edit = array(),
   );
 
   // Create default options array and merge with suitable parents.
-  $parent_relation_options = array(0 => '<' . t('root') . '>') + organigrams_item_get_suitable_parents_options($organigrams_item->iid, $organigram->oid);
+  $parent_relation_options = array(0 => t('<root>')) + organigrams_item_get_suitable_parents_options($organigrams_item->iid, $organigram->oid);
   $form['parent'] = array(
     '#type' => 'select',
     '#title' => t('Parent item'),
@@ -303,11 +305,11 @@ function organigrams_form_organigrams_item($form, &$form_state, $edit = array(),
 /**
  * Delete organigrams item confirm form.
  *
- * @param $form
+ * @param array $form
  *   The form being used to edit the node.
- * @param $form_state
+ * @param array $form_state
  *   The form state array.
- * @param $organigram_item
+ * @param object $organigrams_item
  *   The object to delete.
  *
  * @return mixed

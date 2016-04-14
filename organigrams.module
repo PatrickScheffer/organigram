@@ -13,7 +13,7 @@ function organigrams_entity_info() {
   // Declare the 'organigrams_item' entity.
   $entities['organigrams_item'] = array(
     'label' => t('Organigram item'),
-    'controller class' => 'organigramsItemController',
+    'controller class' => 'OrganigramsItemController',
     'base table' => 'organigrams_item_data',
     'fieldable' => FALSE,
     'entity keys' => array(
@@ -45,7 +45,7 @@ function organigrams_entity_info() {
   // Declare the 'organigrams' entity.
   $entities['organigrams'] = array(
     'label' => t('Organigram'),
-    'controller class' => 'organigramsController',
+    'controller class' => 'OrganigramsController',
     'base table' => 'organigrams_data',
     'entity keys' => array(
       'id' => 'oid',
@@ -85,7 +85,7 @@ function organigrams_entity_property_info() {
   // Add meta-data about the basic organigrams item properties.
   $properties = &$info['organigrams_item']['properties'];
 
-  // organigrams item related properties.
+  // Organigrams item related properties.
   $properties['iid'] = array(
     'label' => t('Organigram item ID'),
     'description' => t('The unique ID of the organigram item.'),
@@ -180,7 +180,7 @@ function organigrams_entity_property_info() {
   // Add meta-data about the basic organigrams properties.
   $properties = &$info['organigrams']['properties'];
 
-  // organigrams related variables.
+  // Organigrams related variables.
   $properties['oid'] = array(
     'label' => t('Organigram ID'),
     'description' => t('The unique ID of the organigram.'),
@@ -457,7 +457,7 @@ function organigrams_block_info() {
   // Initialize blocks array.
   $blocks = array();
   // Iterate through all the available organigrams.
-  foreach (organigrams_get_names() as $machine_name => $organigram) {
+  foreach (organigrams_get_names() as $organigram) {
     // Add organigram block.
     $blocks[$organigram->oid] = array(
       'info' => t('Organigram: !organigram', array(
@@ -495,7 +495,7 @@ function organigrams_block_view($delta = '') {
 /**
  * Admin menu callback to redirect to the organigram view page.
  *
- * @param $organigram
+ * @param mixed $organigram
  *   An organigram entity or machine name.
  */
 function organigrams_redirect_to_view_page($organigram) {
@@ -523,7 +523,7 @@ function organigrams_redirect_to_view_page($organigram) {
 /**
  * Menu callback to display an organigram.
  *
- * @param $organigram
+ * @param mixed $organigram
  *   An organigram entity, ID or machine name.
  *
  * @return array
@@ -554,8 +554,6 @@ function organigrams_view_page($organigram) {
   if (!organigrams_entity_access('view', $organigram)) {
     drupal_access_denied();
   }
-
-  drupal_set_title($organigram->name);
 
   // Generate the organigram renderable array.
   $content = entity_view('organigrams', array($organigram), 'organigram');
@@ -872,13 +870,13 @@ function organigrams_theme() {
 /**
  * Get a value indicating whether the user perform the operation.
  *
- * @param $operation
+ * @param string $operation
  *   An operation to perform on the organigram. Valid values are view, edit and
  *   delete.
- * @param $object
+ * @param mixed $object
  *   An organigram ID, machine name or object on which the operation will be
  *   performed.
- * @param $account
+ * @param mixed $account
  *   The account to check, if not given use currently logged in user.
  *
  * @return bool
@@ -927,7 +925,7 @@ function organigrams_user_access($operation, $object, $account = NULL) {
 /**
  * Get the organigrams name which can be used as page title.
  *
- * @param $organigrams
+ * @param object $organigrams
  *   An organigrams entity.
  *
  * @return string
@@ -940,7 +938,7 @@ function organigrams_title($organigrams) {
 /**
  * Get the organigrams item name which can be used as page title.
  *
- * @param $organigrams_item
+ * @param object $organigrams_item
  *   An organigrams item entity.
  *
  * @return string
@@ -953,12 +951,12 @@ function organigrams_item_title($organigrams_item) {
 /**
  * Access callback for the organigrams entities.
  *
- * @param $op
+ * @param string $op
  *   An operation to perform on the organigram. Valid values are view, edit and
  *   delete.
- * @param $entity
+ * @param object $entity
  *   An organigrams entity on which the operation will be performed.
- * @param $account
+ * @param mixed $account
  *   The account to check, if not given use currently logged in user.
  *
  * @return bool
@@ -973,11 +971,11 @@ function organigrams_entity_access($op, $entity, $account = NULL) {
 /**
  * Entity API property setter callback organigrams item.
  *
- * @param $organigrams_item
+ * @param object $organigrams_item
  *   An organigrams item entity.
- * @param $name
+ * @param string $name
  *   A string containing the property name.
- * @param $value
+ * @param mixed $value
  *   A string or integer to set as property value.
  *
  * @return mixed
@@ -1000,9 +998,9 @@ function organigrams_metadata_organigrams_item_setter($organigrams_item, $name, 
 /**
  * Generate an renderable item list array for the specified organigram.
  *
- * @param $organigram
+ * @param object $organigram
  *   An organigrams entity.
- * @param $langcode
+ * @param mixed $langcode
  *   The language in which the organigram needs to be rendered.
  *
  * @return array
@@ -1106,9 +1104,9 @@ function organigrams_compose_organigrams($organigram, $langcode = NULL) {
  * The orgchart library will extract the node data from the list item
  * attributes.
  *
- * @param $hierarchical_list
+ * @param array $hierarchical_list
  *    An array containing all organigrams items sorted by parent.
- * @param $parent
+ * @param int $parent
  *    The parent ID of an organigrams item.
  *
  * @return array
@@ -1117,7 +1115,7 @@ function organigrams_compose_organigrams($organigram, $langcode = NULL) {
 function organigrams_generate_items_list($hierarchical_list = array(), $parent = 0) {
   $ul_list = array();
   if (isset($hierarchical_list[$parent])) {
-    foreach ($hierarchical_list[$parent] as $id => $item) {
+    foreach ($hierarchical_list[$parent] as $item) {
       $ul_list[] = array(
         'data'             => str_replace('[br]', '<br />', decode_entities(check_plain($item->name))),
         'children'         => organigrams_generate_items_list($hierarchical_list, $item->iid),
@@ -1142,7 +1140,7 @@ function organigrams_generate_items_list($hierarchical_list = array(), $parent =
  * Get a list of organigram names.
  *
  * @return array
- *   An array of organigrams ids, names and machine names, keyed by machine name.
+ *   An array of organigram ids, names and machine names, keyed by machine name.
  */
 function organigrams_get_names() {
   // Retrieve all organigrams.
@@ -1165,15 +1163,15 @@ function organigrams_get_organigrams() {
 /**
  * Create a hierarchical representation of an organigram.
  *
- * @param $oid
+ * @param int $oid
  *   An organigrams ID.
- * @param $parent
+ * @param int $parent
  *   An organigrams item ID under which to generate the tree. If 0, generate the
  *   tree for the entire organigrams.
- * @param $max_depth
+ * @param mixed $max_depth
  *   The number of levels of the tree to return. Leave NULL to return all
  *   levels.
- * @param $load_entities
+ * @param bool $load_entities
  *   If TRUE, a full entity load will occur on the organigrams item objects.
  *   Otherwise they are partial objects queried directly from the
  *   {organigrams_item_data} table to save execution time and memory consumption
@@ -1303,7 +1301,7 @@ function organigrams_get_tree($oid, $parent = 0, $max_depth = NULL, $load_entiti
 /**
  * Get an organigrams object matching an organigrams machine name.
  *
- * @param $name
+ * @param string $name
  *   An organigrams machine name.
  *
  * @return mixed
@@ -1320,7 +1318,7 @@ function organigrams_machine_name_load($name) {
 /**
  * Try to map a string to an existing organigrams item, as for glossary use.
  *
- * @param $name
+ * @param string $name
  *   An organigrams item name to search for.
  *
  * @return array
@@ -1357,7 +1355,7 @@ function organigrams_load($oid) {
 /**
  * Get an organigrams item object matching the organigrams item ID.
  *
- * @param $iid
+ * @param int $iid
  *   An organigrams item ID.
  *
  * @return object
@@ -1385,16 +1383,16 @@ function organigrams_item_load($iid) {
  * organigram from the database. organigrams are loaded into memory and will not
  * require database access if loaded again during the same page request.
  *
- * @param $oids
+ * @param array $oids
  *   An array of organigrams IDs.
- * @param $conditions
+ * @param array $conditions
  *   An associative array of conditions on the {organigrams} table, where the
  *   keys are the database fields and the values are the values those fields
  *   must have.
  *
  * @return array
  *   An array of organigrams objects, keyed by oid.
- **/
+ */
 function organigrams_load_multiple($oids = array(), $conditions = array()) {
   // Retrieve an array of organigrams objects using the specified conditions and
   // return the result.
@@ -1409,9 +1407,9 @@ function organigrams_load_multiple($oids = array(), $conditions = array()) {
  * and will not require database access if loaded again during the same page
  * request.
  *
- * @param $iids
+ * @param array $iids
  *   An array of organigrams item IDs.
- * @param $conditions
+ * @param array $conditions
  *   An associative array of conditions on the {organigrams} table, where the
  *   keys are the database fields and the values are the values those fields
  *   must have.
@@ -1420,15 +1418,15 @@ function organigrams_load_multiple($oids = array(), $conditions = array()) {
  *   An array of organigrams item objects, indexed by iid.
  */
 function organigrams_item_load_multiple($iids = array(), $conditions = array()) {
-  // Retrieve an array of organigrams item objects using the specified conditions
-  // and return the result.
+  // Retrieve an array of organigrams item objects using the specified
+  // conditions and return the result.
   return entity_load('organigrams_item', $iids, $conditions);
 }
 
 /**
  * Save an organigram given an organigrams object.
  *
- * @param $organigrams
+ * @param entity $organigrams
  *   An organigrams object.
  *
  * @return int
@@ -1496,7 +1494,7 @@ function organigrams_save($organigrams) {
 /**
  * Save an organigrams item given an organigrams item object.
  *
- * @param $organigrams_item
+ * @param object $organigrams_item
  *   An organigrams item object.
  *
  * @return int
@@ -1551,7 +1549,7 @@ function organigrams_item_save($organigrams_item) {
 /**
  * Delete an organigram given the organigrams ID.
  *
- * @param $oid
+ * @param int $oid
  *   An integer representing an organigrams ID.
  *
  * @return int
@@ -1608,7 +1606,7 @@ function organigrams_delete($oid) {
 /**
  * Delete an organigrams item.
  *
- * @param $iid
+ * @param object $iid
  *   An organigrams item.
  *
  * @throws \Exception
@@ -1664,7 +1662,7 @@ function organigrams_item_delete($iid) {
 /**
  * Finds all children of an organigrams item ID.
  *
- * @param $iid
+ * @param int $iid
  *   An organigrams item ID.
  *
  * @return array
@@ -1694,7 +1692,7 @@ function organigrams_item_get_children($iid) {
 /**
  * Find parent of a given organigrams item ID.
  *
- * @param $iid
+ * @param int $iid
  *   An organigrams item ID.
  *
  * @return mixed
@@ -1716,9 +1714,9 @@ function organigrams_item_get_parent($iid) {
  *
  * This function is suitable for selection form elements.
  *
- * @param $iid
+ * @param int $iid
  *   An organigrams item ID.
- * @param $oid
+ * @param int $oid
  *   An organigrams ID.
  *
  * @return array
@@ -1768,7 +1766,7 @@ function organigrams_items_static_reset() {
  * This extends the DrupalDefaultEntityController class, adding required
  * special handling for organigrams objects.
  */
-class organigramsController extends EntityAPIController {
+class OrganigramsController extends EntityAPIController {
 
   /**
    * Builds the query to load the entity.
@@ -1800,16 +1798,16 @@ class organigramsController extends EntityAPIController {
  * This extends the DrupalDefaultEntityController class. Only alternation is
  * that we match the condition on organigrams item name case-independently.
  */
-class organigramsItemController extends EntityAPIController {
+class OrganigramsItemController extends EntityAPIController {
 
   /**
    * Builds the query to load the entity.
    *
-   * @param $ids
+   * @param array $ids
    *   An array of entity IDs, or FALSE to load all entities.
-   * @param $conditions
+   * @param array $conditions
    *   An array of conditions in the form 'field' => $value.
-   * @param $revision_id
+   * @param mixed $revision_id
    *   The ID of the revision to load, or FALSE if this query is asking for the
    *   most current revision(s).
    *
@@ -1839,10 +1837,10 @@ class organigramsItemController extends EntityAPIController {
   /**
    * Gets entities from the static cache.
    *
-   * @param $ids
-   *   If not empty, return entities that match these IDs.
-   * @param $conditions
-   *   If set, return entities that match all of these conditions.
+   * @param array $ids
+   *   An array of entity IDs, or FALSE to load all entities.
+   * @param array $conditions
+   *   An array of conditions in the form 'field' => $value.
    *
    * @return array
    *   Array of entities from the entity cache.

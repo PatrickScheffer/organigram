@@ -7,7 +7,7 @@
 /**
  * Theme function for the form 'organigrams_form_overview_organigrams'.
  *
- * @param $variables
+ * @param array $variables
  *   An array containing form elements.
  *
  * @return string

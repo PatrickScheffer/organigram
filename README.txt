@@ -13,8 +13,8 @@ CONTENTS OF THIS FILE
 INTRODUCTION
 ------------
 
-Organigrams provides the ability to easily create and manage organization charts,
-also knows as organigrams.
+Organigrams provides the ability to easily create and manage organization
+charts, also knows as organigrams.
 
 You can create organigram bundles (with own fields and display) and add
 organigram items to that bundles. These items contain a static set of fields and
@@ -65,8 +65,8 @@ PLUGINS
    1. Download here: https://github.com/arv/ExplorerCanvas/archive/aa989ea9d9bac748638f7c66b0fc88e619715da6.zip
    2. Place the contents of this zip in your libraries folder. See the readme of
       the libraries module for more information about this.
-   3. Rename the extracted folder to **excanvas** so the path to the javascript
-      becomes `libraries/excanvas/excanvas.js`.
+   3. Rename the extracted folder to 'excanvas' so the path to the javascript
+      becomes 'libraries/excanvas/excanvas.js'.
 
  * ColorPicker by Evoluteur
    Adds a color picker to fields like border color and background color.
@@ -75,9 +75,10 @@ PLUGINS
    1. Download here: https://github.com/evoluteur/colorpicker/archive/233e15e4368b0d1eb30f8036a1f5970f09e8ed9e.zip
    2. Place the contents of this zip in your libraries folder. See the readme of
       the libraries module for more information about this.
-   3. Rename the extracted folder to **colorpicker** so the path to the javascript
-      becomes `libraries/colorpicker/js/evol-colorpicker.min.js` and the path to
-      the css becomes `libraries/colorpicker/css/evol-colorpicker.min.css`.
+   3. Rename the extracted folder to 'colorpicker' so the path to the
+      javascript becomes 'libraries/colorpicker/js/evol-colorpicker.min.js' and
+      the path to the css becomes
+      'libraries/colorpicker/css/evol-colorpicker.min.css'.
 
 
 INSTALLATION
@@ -109,7 +110,7 @@ CONFIGURATION
 
 
 BROWSER SUPPORT
---------------_
+---------------
 
 Organigrams is tested in the following browsers:
 
