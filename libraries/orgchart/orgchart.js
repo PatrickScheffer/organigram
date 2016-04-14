@@ -7,7 +7,7 @@
  */
 
 /**
- * Interface:
+ * Interface.
  *
  *          +----------
  *          |  root   |
@@ -129,10 +129,11 @@
 var G_vmlCanvasManager;
 
 // IE has no console.log.
-if (!window.console) console = {
-  log: function () {
-  }
-};
+if (!window.console) {
+  console = {
+    log: function() {}
+  };
+}
 
 function orgChart() {
 
@@ -221,7 +222,6 @@ function orgChart() {
     getAbsPosY,
     centerOnCanvas,
     leftOnCanvas;
-
 
   // Internal information structures.
   var Node = function (id, parent, contype, txt, bold, url, linecolor, fillcolor, textcolor, imgalign, imgvalign) {
@@ -383,12 +383,24 @@ function orgChart() {
       ctype = 'u';
     }
     imgvalign = 'm';
-    if (imgalign.substr(1, 1) == 't' || imgalign.substr(1, 1) == 'T') imgvalign = 't';
-    if (imgalign.substr(1, 1) == 'b' || imgalign.substr(1, 1) == 'B') imgvalign = 'b';
-    if (imgalign.substr(0, 1) == 'c' || imgalign.substr(0, 1) == 'C') imgalign = 'c';
-    if (imgalign.substr(0, 1) == 'm' || imgalign.substr(0, 1) == 'M') imgalign = 'c';  // Service!
-    if (imgalign.substr(0, 1) == 'r' || imgalign.substr(0, 1) == 'R') imgalign = 'r';
-    if (imgalign != 'c' && imgalign != 'r') imgalign = 'l';
+    if (imgalign.substr(1, 1) == 't' || imgalign.substr(1, 1) == 'T') {
+      imgvalign = 't';
+    }
+    if (imgalign.substr(1, 1) == 'b' || imgalign.substr(1, 1) == 'B') {
+      imgvalign = 'b';
+    }
+    if (imgalign.substr(0, 1) == 'c' || imgalign.substr(0, 1) == 'C') {
+      imgalign = 'c';
+    }
+    if (imgalign.substr(0, 1) == 'm' || imgalign.substr(0, 1) == 'M') {
+      imgalign = 'c';
+    }
+    if (imgalign.substr(0, 1) == 'r' || imgalign.substr(0, 1) == 'R') {
+      imgalign = 'r';
+    }
+    if (imgalign != 'c' && imgalign != 'r') {
+      imgalign = 'l';
+    }
 
     var i;
     for (i = 0; i < nodes.length; i++) {
@@ -512,7 +524,9 @@ function orgChart() {
     // If no width is set, calculate it from the node data.
     if (maxW == 0) {
       for (i = 0; i < nodes.length; i++) {
-        if (nodes[i].hpos + boxWidth + nodes[i].shadowOffsetX > maxW) maxW = nodes[i].hpos + boxWidth + nodes[i].shadowOffsetX;
+        if (nodes[i].hpos + boxWidth + nodes[i].shadowOffsetX > maxW) {
+          maxW = nodes[i].hpos + boxWidth + nodes[i].shadowOffsetX;
+        }
       }
       // Overwrite the canvas width. Add 1 to fix the half pixel bug by which
       // lines are blurred.
@@ -525,7 +539,9 @@ function orgChart() {
     // If no height is set, calculate it from the node data.
     if (maxH == 0) {
       for (i = 0; i < nodes.length; i++) {
-        if (nodes[i].vpos + boxHeight + nodes[i].shadowOffsetY > maxH) maxH = nodes[i].vpos + boxHeight + nodes[i].shadowOffsetY;
+        if (nodes[i].vpos + boxHeight + nodes[i].shadowOffsetY > maxH) {
+          maxH = nodes[i].vpos + boxHeight + nodes[i].shadowOffsetY;
+        }
       }
       // Overwrite the canvas height. Add 1 to fix the half pixel bug by which
       // lines are blurred.
@@ -584,10 +600,12 @@ function orgChart() {
         var mtarget = document.getElementById(id);
         orgChartClick(event, mtarget.scrollLeft, mtarget.scrollTop - 20);
       };
+
       theCanvas.onmousemove = function () {
         var mtarget = document.getElementById(id);
         orgChartMouseMove(event, mtarget.scrollLeft, mtarget.scrollTop - 20);
       };
+
       theCanvas.onmouseout = function () {
         orgChartResetCursor();
       };
@@ -799,7 +817,6 @@ function orgChart() {
         if (nodes[i].parentix === -1) {
           debugOut("Node " + nodes[i].id + " has an invalid parent '" + nodes[i].parent + "'");
           nodes[i].parent = '';
-          //nodes[i].txt += ' (unknown parent)';
         }
       }
     }
