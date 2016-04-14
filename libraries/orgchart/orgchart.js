@@ -1,112 +1,128 @@
-// Version 1.14
-//
-// Original version: 1.13 by J. van Loenen found here:
-// https://jvloenen.home.xs4all.nl/orgchart/sample.htm
-//
-// Interface:
-//
-//          +----------
-//          |  root   |
-//          +---------+
-//               |
-//  +---------+  |  +---------+
-//  | 'l' box |--+--| 'r' box |
-//  +---------+  |  +---------+
-//               |
-//          +----------
-//          | 'u' box |
-//          +----------
-//
-// setSize(width, height, hspace, vspace, hshift)
-//		Generic setting, all boxes will have the same size.
-//	width	box width in pixels (optional)
-//	height	box height in pixels (optional)
-//	hspace	horizontal space between boxes (optional)
-//	vspace	vertical space between boxes (optional)
-//	hshift	horizontal shift for 'l' and 'r' boxes (optional)
-//
-// setNodeStyle(toprad, botrad, shadow)
-//		Set the corner style and shade for all node from now on
-//	toprad	The radius of the corners on the top. 0 for square boxes. Default value is 5.
-//	botrad	The radius of the corners on the bottom. 0 for square boxes. Default value is 5.
-//	shadow	Offset of the shadow. 0 for no shadow. Default value is 3.
-//		No negative values for this function
-//
-// setFont(fname, size, color, valign)
-//		Set the font for nodes from now on
-//	fname	font name (eq. "arial")
-//	size	font size (in pixels, eg "12")
-//	color	rgb font color (optional, not changed if omitted)
-//	valign	Vertical alignment on/off (optional, not changed if omitted)
-//
-// setColor(bline, bfill, btext, cline)
-//		Set the colors for the nodes from now on
-//	bline	rgb line color for the boxes (optional, not changed if omitted)
-//	bfill	rgb fill color for the boxes (optional, not changed if omitted)
-//	btext	rgb font color for the boxes (optional, not changed if omitted)
-//	cline	rgb line color for the connection lines (optional, not changed if omitted)
-//
-// addNode(id, parent, ctype, text, bold, url, cline, cfill, ctext, image, imgalign)
-//		Add a node to the chart
-//	id	unique id of this node (required)
-//	parent	id of the parent node (-1 for no parent)
-//	ctype	connection type to the parent ('u' for under, 'l' for left, 'r' for right)
-//	text	the text for the box (optional, none if omitted)
-//	bold	bold lines for this box (optional, no bold if omitted)
-//	url	a link attached to the box (optional, none if omitted)
-//	cline	rgb line color (optional, default value will be used if omitted)
-//	cfill	rgb fill color (optional, default value will be used if omitted)
-//	ctext	rgb font color (optional, default value will be used if omitted)
-//	image	optional image
-//	align	image alignment L(eft), C(enter), R(ight) + T(op), M(iddle), B(ottom)
-//
-// drawChart(id, width, height, align)
-//		Draws the chart on the canvas
-//	id	id of the canvas
-//  width integer in pixels for a static with, auto for automatic calculation
-//  and parent to use the container element's with.
-//	align	'c' of 'center' for horizontal alignment on the canvas (left alignment if omitted)
-//
-// redrawChart(id)
-//		Re-draws the in-memory chart on the canvas
-//		(Resizing a canvas clears the content).
-//	id	id of the canvas
-//
-// setDebug(value)
-//		Sets the global debug mode
-//	value	1 for on, 0 for off
-//
-// eg. var MyChart = new orgChart();
-//
-// Change history:
-// ===============
-// J. van Loenen
-// 2013-02-23	New: Lines breaks on \n sequences
-// 2013-02-28 New: redrawChart()
-// 2013-03-12	New: drawChart() will reset first: you can add/move nodes and redraw on an existing chart
-// 2013-03-13	New: drawChart - Fit argument
-// 2013-04-19	Fixed: Event coordinates in IE
-// 2013-08-23	New: Images on nodes
-// 2013-10-21	Fixed: Shift bugs on multiple left/right-nodes
-// 2013-10-21	New: Retina support
-// 2013-10-23	Fixed: Textbreaks didn't split correctly sometimes
-// 2013-11-07	Fixed: Center-parent bug if no room and only one usib
-// 2013-11-07	Fixed: Shift bug on a single u-node fixed.
-// 2013-11-21	Fixed: Several placement bugs.
-// 2013-11-22	New: setNodeStyle()
-// 2014-01-09	Fixed: Line bug if low node defined first and other have only left or right siblings.
-// 2014-01-09	Fixed: Image-not-found images wrong placed
-// 2015-11-20	Fixed: Overlapping nodes on using r-siblings only
-// 2015-11-23	Fixed: Wrong positioning on some complex examples
-// P. Scheffer
-// 2016-04-07 New: Added options to set width and height of the organigram
-// 2016-04-07 New: Node placement takes the organigram width into account
-// 2016-04-07 Fixed: Wrong horizontal offset in multiple l-siblings below each other
-// 2016-04-12 Fixed: Division by zero on auto calculating width and usibs per line
-// 2016-04-12 New: Organigram is responsive if width is set to parent and drawChart is called on window resize
-// 2016-04-13 New: Added line connection between multi-row usibs
-// 2016-04-13 Fixed: Blurry lines (also on resize)
-// 2016-04-13 Fixed: Cursor stays pointer when moving to fast off canvas
+/**
+ * @file
+ * OrgChart Library
+ * Version 1.14
+ *
+ * Original version: 1.13 by J. van Loenen found here:
+ * https://jvloenen.home.xs4all.nl/orgchart/sample.htm
+ *
+ * Interface:
+ *
+ *          +----------
+ *          |  root   |
+ *          +---------+
+ *               |
+ *  +---------+  |  +---------+
+ *  | 'l' box |--+--| 'r' box |
+ *  +---------+  |  +---------+
+ *               |
+ *          +----------
+ *          | 'u' box |
+ *          +----------
+ *
+ * setSize(width, height, hspace, vspace, hshift)
+ *   Generic setting, all boxes will have the same size.
+ *	 - width	box width in pixels (optional)
+ *	 - height	box height in pixels (optional)
+ *	 - hspace	horizontal space between boxes (optional)
+ *	 - vspace	vertical space between boxes (optional)
+ *	 - hshift	horizontal shift for 'l' and 'r' boxes (optional)
+ *
+ * setNodeStyle(toprad, botrad, shadow)
+ *   Set the corner style and shade for all node from now on
+ *	 - toprad	The radius of the corners on the top. 0 for square boxes. Default
+ *	   value is 5.
+ *	 - botrad	The radius of the corners on the bottom. 0 for square boxes.
+ *	   Default value is 5.
+ *	 - shadow	Offset of the shadow. 0 for no shadow. Default value is 3.
+ *		 No negative values for this function
+ *
+ * setFont(fname, size, color, valign)
+ *	 Set the font for nodes from now on
+ *	 - fname	font name (eq. "arial")
+ *	 - size	font size (in pixels, eg "12")
+ *	 - color	rgb font color (optional, not changed if omitted)
+ *	 - valign	Vertical alignment on/off (optional, not changed if omitted)
+ *
+ * setColor(bline, bfill, btext, cline)
+ *	 Set the colors for the nodes from now on
+ *	 - bline	rgb line color for the boxes (optional, not changed if omitted)
+ *	 - bfill	rgb fill color for the boxes (optional, not changed if omitted)
+ *	 - btext	rgb font color for the boxes (optional, not changed if omitted)
+ *	 - cline	rgb line color for the connection lines (optional, not changed if
+ *	   omitted)
+ *
+ * addNode(id, parent, ctype, text, bold, url, cline, cfill, ctext, image, imgalign)
+ *	 Add a node to the chart
+ *	 - id	unique id of this node (required)
+ *	 - parent	id of the parent node (-1 for no parent)
+ *	 - ctype	connection type to the parent ('u' for under, 'l' for left, 'r'
+ *	   for right)
+ *	 - text	the text for the box (optional, none if omitted)
+ *	 - bold	bold lines for this box (optional, no bold if omitted)
+ *	 - url	a link attached to the box (optional, none if omitted)
+ *	 - cline	rgb line color (optional, default value will be used if omitted)
+ *	 - cfill	rgb fill color (optional, default value will be used if omitted)
+ *	 - ctext	rgb font color (optional, default value will be used if omitted)
+ *	 - image	optional image
+ *	 - align	image alignment L(eft), C(enter), R(ight) + T(op), M(iddle)
+ *	   B(ottom)
+ *
+ * drawChart(id, width, height, align)
+ *	 Draws the chart on the canvas
+ *	 - id	id of the canvas
+ *   - width integer in pixels for a static with, auto for automatic calculation
+ *     and parent to use the container element's with.
+ *	 - align	'c' of 'center' for horizontal alignment on the canvas (left
+ *	   alignment if omitted)
+ *
+ * redrawChart(id)
+ *	 Re-draws the in-memory chart on the canvas (Resizing a canvas clears the
+ *	 content).
+ *	 - id	id of the canvas
+ *
+ * setDebug(value)
+ *	 Sets the global debug mode
+ *	 - value	1 for on, 0 for off
+ *
+ * eg. var MyChart = new orgChart();
+ *
+ * Change history:
+ * ===============
+ * J. van Loenen
+ * 2013-02-23	New: Lines breaks on \n sequences.
+ * 2013-02-28 New: redrawChart().
+ * 2013-03-12	New: drawChart() will reset first: you can add/move nodes and
+ *            redraw on an existing chart.
+ * 2013-03-13	New: drawChart - Fit argument.
+ * 2013-04-19	Fixed: Event coordinates in IE.
+ * 2013-08-23	New: Images on nodes.
+ * 2013-10-21	Fixed: Shift bugs on multiple left/right-nodes.
+ * 2013-10-21	New: Retina support.
+ * 2013-10-23	Fixed: Textbreaks didn't split correctly sometimes.
+ * 2013-11-07	Fixed: Center-parent bug if no room and only one usib.
+ * 2013-11-07	Fixed: Shift bug on a single u-node fixed.
+ * 2013-11-21	Fixed: Several placement bugs.
+ * 2013-11-22	New: setNodeStyle().
+ * 2014-01-09	Fixed: Line bug if low node defined first and other have only left
+ *            or right siblings.
+ * 2014-01-09	Fixed: Image-not-found images wrong placed.
+ * 2015-11-20	Fixed: Overlapping nodes on using r-siblings only.
+ * 2015-11-23	Fixed: Wrong positioning on some complex examples.
+ *
+ * P. Scheffer
+ * 2016-04-07 New: Added options to set width and height of the organigram.
+ * 2016-04-07 New: Node placement takes the organigram width into account.
+ * 2016-04-07 Fixed: Wrong horizontal offset in multiple l-siblings below each
+ *            other.
+ * 2016-04-12 Fixed: Division by zero on auto calculating width and usibs per
+ *            line.
+ * 2016-04-12 New: Organigram is responsive if width is set to parent and
+ *            drawChart is called on window resize.
+ * 2016-04-13 New: Added line connection between multi-row usibs.
+ * 2016-04-13 Fixed: Blurry lines (also on resize).
+ * 2016-04-13 Fixed: Cursor stays pointer when moving to fast off canvas.
+ */
 
 var G_vmlCanvasManager;	// so non-IE won't freak out
 
