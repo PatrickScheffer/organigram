@@ -1106,12 +1106,12 @@ function orgChart() {
 
   /**
    * Position the complete tree under this parent.
+   * Var p has a position already. Position 'l', 'r' and 'u' sibs:
    */
   positionTree = function (p) {
     var h, v, s, o, i, n, w, q, r, us, uo, x, maxx, minx, max2, x1, x2, y, hdl, vdl, l, r, t;
 
     debugOut("positionTree(" + nodes[p].txt + ", " + nodes[p].hpos + ", " + nodes[p].vpos + ")");
-    // Var p has a position already. Position 'l', 'r' and 'u' sibs:
 
     // Positioning all 'l' sibs.
     for (v = 0; v < nodes[p].lsib.length; v++) {
@@ -1119,9 +1119,8 @@ function orgChart() {
       debugOut("New lsib: " + nodes[s].txt + " under " + nodes[p].txt);
       // New lsib, so the downline crosses all the way down. Make room first.
       y = getLowestBox(p, "l") + boxHeight + vSpace;
-      // Commented out this function because it added an unwanted spacing to all
-      // left nodes.
-      // makeRoomForDownline(p, y);
+      // Removed function makeRoomForDownline(p, y) here because it added an
+      // unwanted spacing to all left nodes.
       nodes[s].hpos = nodes[p].hpos - boxWidth / 2 - hShift;
       nodes[s].vpos = y;
       if (nodes[s].hpos < 0) {

@@ -4,6 +4,7 @@
  */
 
 (function ($) {
+  'use strict';
   Drupal.behaviors.organigrams = {
     attach: function (context, settings) {
 
