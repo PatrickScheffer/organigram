@@ -3,10 +3,10 @@
  * Initiate ColorPicker.
  */
 
-(function($) {
+(function ($) {
   'use strict';
   Drupal.behaviors.organigrams = {
-    attach: function(context, settings) {
+    attach: function (context, settings) {
 
       // Check if the colorpicker plugin is loaded.
       if (jQuery().colorpicker) {
@@ -14,7 +14,7 @@
         var pointer_width = 32;
         // Get the input width.
         var input_width = $('.colorpicker').width();
-        if (input_width == 0) {
+        if (input_width === 0) {
           input_width = $('input').width();
         }
 
