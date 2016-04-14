@@ -1426,7 +1426,7 @@ function organigrams_item_load_multiple($iids = array(), $conditions = array()) 
 /**
  * Save an organigram given an organigrams object.
  *
- * @param entity $organigrams
+ * @param object $organigrams
  *   An organigrams object.
  *
  * @return int
