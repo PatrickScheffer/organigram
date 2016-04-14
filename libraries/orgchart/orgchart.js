@@ -1,9 +1,9 @@
 /**
  * @file
- * OrgChart Library v1.14
+ * Contains OrgChart Library v1.14.
  *
  * Original version: 1.13 by J. van Loenen found here:
- * https://jvloenen.home.xs4all.nl/orgchart/sample.htm
+ * https://jvloenen.home.xs4all.nl/orgchart/sample.htm.
  */
 
 /**
@@ -125,33 +125,44 @@
  * 2016-04-13 Fixed: Cursor stays pointer when moving to fast off canvas.
  */
 
-var G_vmlCanvasManager;  // so non-IE won't freak out
+// So non-IE won't freak out.
+var G_vmlCanvasManager;
 
+// IE has no console.log.
 if (!window.console) console = {
   log: function () {
   }
-};  // IE has no console.log
+};
 
 function orgChart() {
 
   "use strict";
 
-///////////////////
-// Default values:
-///////////////////
-
-  var lineColor = "#3388DD",    // Color of the connection lines (global for all lines)
-    boxWidth = 120,      // Box width (global for all boxes)
-    boxHeight = 30,      // Box height (global for all boxes)
-    hSpace = 20,      // Horizontal space in between the boxes (global for all boxes)
-    vSpace = 20,      // Vertical space in between the boxes (global for all boxes)
-    hShift = 30,      // The number of pixels vertical siblings are shifted (global for all boxes)
-    boxLineColor = "#B5D9EA",  // Default box line color
-    boxFillColor = "#CFE8EF",  // Default box fill color
-    textColor = "#000000",    // Default box text color
-    textFont = "arial",    // Default font
-    textSize = 12,      // Default text size (pixels, not points)
-    textVAlign = 1,      // Default text alignment
+  // Default values.
+  // Color of the connection lines (global for all lines).
+  var lineColor = "#3388DD",
+  // Box width (global for all boxes).
+    boxWidth = 120,
+  // Box height (global for all boxes).
+    boxHeight = 30,
+  // Horizontal space in between the boxes (global for all boxes).
+    hSpace = 20,
+  // Vertical space in between the boxes (global for all boxes).
+    vSpace = 20,
+  // The number of pixels vertical siblings are shifted (global for all boxes).
+    hShift = 30,
+  // Default box line color.
+    boxLineColor = "#B5D9EA",
+  // Default box fill color.
+    boxFillColor = "#CFE8EF",
+  // Default box text color.
+    textColor = "#000000",
+  // Default font.
+    textFont = "arial",
+  // Default text size (pixels, not points).
+    textSize = 12,
+  // Default text alignment.
+    textVAlign = 1,
 
     curshadowOffsetX = 3,
     curshadowOffsetY = 3,
@@ -160,17 +171,15 @@ function orgChart() {
     curbotradius = 5,
     nodes = [],
     theCanvas,
-    centerParentOverCompleteTree = 0,  // Experimental, lines may loose connections
+    centerParentOverCompleteTree = 0,
+  // Experimental, lines may lose connections.
     debug = 0,
     maxLoop = 9,
     noalerts = 0,
-    usibsPerLine = 0; // Number of siblings per line. Gets generated dynamically by canvas width if 0.
+  // Number of siblings per line. Generated dynamically by canvas width if 0.
+    usibsPerLine = 0;
 
-
-//////////////////////
-// Internal functions:
-//////////////////////
-
+  // Internal functions.
   var drawChartPriv,
     orgChartMouseMove,
     orgChartResetCursor,
@@ -214,32 +223,44 @@ function orgChart() {
     leftOnCanvas;
 
 
-////////////////////////////////////
-// Internal information structures:
-////////////////////////////////////
-
+  // Internal information structures.
   var Node = function (id, parent, contype, txt, bold, url, linecolor, fillcolor, textcolor, imgalign, imgvalign) {
-    this.id = id;      // User defined id
-    this.parent = parent;    // Parent id, user defined
-    this.parentix = -1;    // Parent index in the nodes array, -1 for no parent
-    this.contype = contype;    // 'u', 'l', 'r'
-    this.txt = txt;      // Text for the box
-    this.bold = bold;    // 1 for bold, 0 if not
-    this.url = url;      // url
+    // User defined id.
+    this.id = id;
+    // Parent id, user defined.
+    this.parent = parent;
+    // Parent index in the nodes array, -1 for no parent.
+    this.parentix = -1;
+    // Options: 'u', 'l', 'r'.
+    this.contype = contype;
+    // Text for the box.
+    this.txt = txt;
+    // 1 for bold, 0 if not.
+    this.bold = bold;
+    // URL.
+    this.url = url;
     this.linecolor = linecolor;
     this.fillcolor = fillcolor;
     this.textcolor = textcolor;
     this.textfont = textFont;
     this.textsize = textSize;
     this.valign = textVAlign;
-    this.hpos = -1;      // Horizontal starting position in pixels
-    this.vpos = -1;      // Vertical starting position in pixels
-    this.usib = [];      // 'u' siblings
-    this.rsib = [];      // 'r' siblings
-    this.lsib = [];      // 'l' siblings
-    this.img = '';      // Optional image
-    this.imgAlign = imgalign;  // Image alignment 'l', 'c', 'r'
-    this.imgVAlign = imgvalign;  // Image vertical alignment 't', 'm', 'b'
+    // Horizontal starting position in pixels.
+    this.hpos = -1;
+    // Vertical starting position in pixels.
+    this.vpos = -1;
+    // Contains 'u' siblings.
+    this.usib = [];
+    // Contains 'r' siblings.
+    this.rsib = [];
+    // Contains 'l' siblings.
+    this.lsib = [];
+    // Optional image.
+    this.img = '';
+    // Image alignment 'l', 'c', 'r'.
+    this.imgAlign = imgalign;
+    // Image vertical alignment 't', 'm', 'b'.
+    this.imgVAlign = imgvalign;
     this.imgDrawn = 0;
     this.topradius = curtopradius;
     this.botradius = curbotradius;
@@ -247,12 +268,7 @@ function orgChart() {
     this.shadowOffsetY = curshadowOffsetY;
   };
 
-
-//////////////////////
-// Public functions:
-//////////////////////
-
-
+  // Public functions.
   orgChart.prototype.setDebug = function (value) {
     debug = value;
   };
@@ -286,7 +302,7 @@ function orgChart() {
       curshadowOffsetX = shadow;
       curshadowOffsetY = shadow;
     }
-  }
+  };
 
   orgChart.prototype.setFont = function (fname, size, color, valign) {
     if (fname !== undefined) {
@@ -396,7 +412,7 @@ function orgChart() {
   };
 
   orgChart.prototype.drawChart = function (id, width, height, align) {
-    // siblings may be added. Reset all positions first:
+    // siblings may be added. Reset all positions first.
     var i;
     for (i = 0; i < nodes.length; i++) {
       nodes[i].hpos = -1;
@@ -407,16 +423,15 @@ function orgChart() {
     }
 
     drawChartPriv(id, true, width, height, align);
-  }
+  };
 
   orgChart.prototype.redrawChart = function (id) {
     drawChartPriv(id, false);
-  }
+  };
 
-//////////////////////
-// Internal functions:
-//////////////////////
-
+  /**
+   * Draw the chart.
+   */
   drawChartPriv = function (id, repos, width, height, align) {
     var i, ctx, devicePixelRatio, backingStoreRatio, cwidth, cheight, ratio;
 
@@ -426,7 +441,8 @@ function orgChart() {
       return;
     }
 
-    if (G_vmlCanvasManager !== undefined) { // ie IE
+    // IE.
+    if (G_vmlCanvasManager !== undefined) {
       G_vmlCanvasManager.initElement(theCanvas);
     }
 
@@ -498,8 +514,8 @@ function orgChart() {
       for (i = 0; i < nodes.length; i++) {
         if (nodes[i].hpos + boxWidth + nodes[i].shadowOffsetX > maxW) maxW = nodes[i].hpos + boxWidth + nodes[i].shadowOffsetX;
       }
-      // Overwrite the canvas width. Add 1 to fix the half pixel bug by which lines
-      // are blurred.
+      // Overwrite the canvas width. Add 1 to fix the half pixel bug by which
+      // lines are blurred.
       if (maxW > 0) {
         theCanvas.width = maxW + 1;
         theCanvas.style.width = maxW + 1 + 'px';
@@ -511,15 +527,15 @@ function orgChart() {
       for (i = 0; i < nodes.length; i++) {
         if (nodes[i].vpos + boxHeight + nodes[i].shadowOffsetY > maxH) maxH = nodes[i].vpos + boxHeight + nodes[i].shadowOffsetY;
       }
-      // Overwrite the canvas height. Add 1 to fix the half pixel bug by which lines
-      // are blurred.
+      // Overwrite the canvas height. Add 1 to fix the half pixel bug by which
+      // lines are blurred.
       if (maxH > 0) {
         theCanvas.height = maxH + 1;
         theCanvas.style.height = maxH + 1 + 'px';
       }
     }
 
-    // High dpi displays:
+    // High dpi displays.
     if ('devicePixelRatio' in window && theCanvas.width != 0) {
       devicePixelRatio = window.devicePixelRatio || 1;
       backingStoreRatio = ctx.webkitBackingStorePixelRatio ||
@@ -547,21 +563,23 @@ function orgChart() {
     // Fix for blurred lines.
     ctx.translate(0.5, 0.5);
 
-    // Draw the lines:
+    // Draw the lines.
     drawConLines(ctx);
 
-    // Draw the boxes:
+    // Draw the boxes.
     for (i = 0; i < nodes.length; i++) {
       drawNode(ctx, i);
     }
 
-    // Add click behaviour:
+    // Add click behaviour.
     if (theCanvas.addEventListener) {
-      theCanvas.removeEventListener("click", orgChartClick, false);  // If any old on this canvas, remove it
+      // If any old on this canvas, remove it.
+      theCanvas.removeEventListener("click", orgChartClick, false);
       theCanvas.addEventListener("click", orgChartClick, false);
       theCanvas.addEventListener("mousemove", orgChartMouseMove, false);
       theCanvas.addEventListener("mouseout", orgChartResetCursor, false);
-    } else if (theCanvas.attachEvent) { // IE
+    // IE.
+    } else if (theCanvas.attachEvent) {
       theCanvas.onclick = function () {
         var mtarget = document.getElementById(id);
         orgChartClick(event, mtarget.scrollLeft, mtarget.scrollTop - 20);
@@ -574,8 +592,12 @@ function orgChart() {
         orgChartResetCursor();
       };
     }
-  }
+  };
 
+  /**
+   * Turns the mouse cursor in a pointer when hovering over a sibling with a
+   * URL.
+   */
   orgChartMouseMove = function (event) {
     var x, y, i;
 
@@ -604,17 +626,24 @@ function orgChart() {
     }
   };
 
+  /**
+   * Reset the mouse cursor.
+   */
   orgChartResetCursor = function (event) {
     if (document.body.style.cursor == 'pointer') {
       document.body.style.cursor = 'default';
     }
   };
 
+  /**
+   * Handles the click event.
+   */
   orgChartClick = function (event, offsetx, offsety) {
     var x, y, i, i1, i2, d;
 
     if (event.button < 0 || event.button > 1) {
-      return;  // left button (w3c: 0, IE: 1) only
+      // left button (w3c: 0, IE: 1) only.
+      return;
     }
 
     x = event.clientX;
@@ -649,9 +678,11 @@ function orgChart() {
     }
   };
 
+  /**
+   * Shift all usiblings with a vpos >= ymin down, except this parent.
+   */
   vShiftUsibUnderParent = function (p, h, ymin) {
-    // Shift all usiblings with a vpos >= ymin down, except this parent.
-    // ymin is optional
+    // Var ymin is optional.
     if (ymin === undefined) {
       ymin = 0;
     }
@@ -663,8 +694,10 @@ function orgChart() {
     }
   };
 
+  /**
+   * Shift all siblings 'h' down (if they have a position already).
+   */
   vShiftTree = function (p, h, ymin) {
-    // Shift all siblings 'h' down (if they have a position already)
     var s;
 
     if (nodes[p].vpos >= 0 && nodes[p].vpos >= ymin) {
@@ -684,8 +717,10 @@ function orgChart() {
     }
   };
 
+  /**
+   * Shift all siblings (which have a position already) 'w' pixels.
+   */
   hShiftTree = function (p, w) {
-    // Shift all siblings (which have a position already) 'w' pixels
     var s, d;
 
     debugOut("hShiftTree(" + nodes[p].txt + ", " + w + ")");
@@ -711,10 +746,12 @@ function orgChart() {
     debug = d;
   };
 
+  /**
+   * Shift this tree to the right.
+   * If this is an 'u' sib, also shift all brothers which are to the right too.
+   * (In which case we shift all other root nodes too).
+   */
   hShiftTreeAndRBrothers = function (p, w) {
-    // Shift this tree to the right.
-    // If this is an 'u' sib, also shift all brothers which are to the right too.
-    // (In which case we shift all other root nodes too).
     var i, q, s, hpos, hpos2, rp, d;
 
     debugOut("hShiftTreeAndRBrothers(" + nodes[p].txt + ", " + w + ")");
@@ -748,8 +785,8 @@ function orgChart() {
     debug = d;
   };
 
+  // Fill all nodes with the index of the parent.
   fillParentix = function () {
-    // Fill all nodes with the index of the parent.
     var i, j;
     for (i = 0; i < nodes.length; i++) {
       if (nodes[i].parent !== '') {
@@ -768,8 +805,10 @@ function orgChart() {
     }
   };
 
+  /**
+   * Check all vertical lines for crossing boxes. If so, shift to the right.
+   */
   checkLines = function () {
-    // Check all vertical lines for crossing boxes. If so, shift to the right.
     var p;
 
     debugOut("checkLines()");
@@ -786,14 +825,14 @@ function orgChart() {
 
     y = 0;
 
-    // Check lsib, the latest is the lowest point:
+    // Check lsib, the latest is the lowest point.
     n = nodes[p].lsib.length;
     if (n > 0) {
       s = nodes[p].lsib[n - 1];
       y = nodes[s].vpos + boxHeight / 2;
     }
 
-    // Check rsib, the latest is the lowest point:
+    // Check rsib, the latest is the lowest point.
     n = nodes[p].rsib.length;
     if (n > 0) {
       s = nodes[p].rsib[n - 1];
@@ -801,7 +840,7 @@ function orgChart() {
       y = Math.max(y, y2);
     }
 
-    // If usib, the lowest point is even lower:
+    // If usib, the lowest point is even lower.
     n = nodes[p].usib.length;
     if (n > 0) {
       s = nodes[p].usib[0];
@@ -815,7 +854,8 @@ function orgChart() {
           s = getNodeAt(nodes[p].hpos + boxWidth / 2 - 5, n);
           if (s >= 0) {
             debugOut("Overlap between a downline of '" + nodes[p].txt + "' at point (" + (nodes[p].hpos + boxWidth / 2) + ", " + n + ") and node '" + nodes[s].txt + "' (" + nodes[s].hpos + ", " + nodes[s].vpos + ")");
-            // If the node found is a sib of the box with the downline, shifting the parent doesn't help:
+            // If the node found is a sib of the box with the downline,
+            // shifting the parent doesn't help.
             w = nodes[s].hpos + boxWidth + hSpace - (nodes[p].hpos + boxWidth / 2);
             rp = s;
             i = 0;
@@ -823,7 +863,8 @@ function orgChart() {
               rp = nodes[rp].parentix;
             }
             if (rp !== p) {
-              // Find the parent of s on the same vpos as p to decide what to shift:
+              // Find the parent of s on the same vpos as p to decide what to
+              // shift.
               rs = s;
               while (nodes[rs].parent !== '' && nodes[rs].vpos > nodes[p].vpos) {
                 rs = nodes[rs].parentix;
@@ -875,7 +916,7 @@ function orgChart() {
       }
     }
 
-    // Check the siblings:
+    // Check the siblings.
     for (s = 0; s < nodes[p].usib.length; s++) {
       checkLinesRec(nodes[p].usib[s]);
     }
@@ -912,7 +953,8 @@ function orgChart() {
               if (ui !== uj) {
                 hShiftTreeAndRBrothers(uj, boxWidth + hSpace);
               } else {
-                // In the right subtree, find the first 'u' or 'r' parent to shift.
+                // In the right subtree, find the first 'u' or 'r' parent to
+                // shift.
                 uj = j;
                 while (nodes[uj].parent !== '' && nodes[uj].contype !== 'u' && nodes[uj].contype !== 'r') {
                   uj = nodes[uj].parentix;
@@ -1002,7 +1044,7 @@ function orgChart() {
 
     debugOut("positionBoxes()");
 
-    // Position all top level boxes:
+    // Position all top level boxes.
     // The starting pos is 'x'. After the tree is positioned, center it.
     x = 0;
     y = 0;
@@ -1018,24 +1060,27 @@ function orgChart() {
         nodes[i].hpos = x + nodes[i].shadowOffsetX;
         nodes[i].vpos = y + nodes[i].shadowOffsetY;
         positionTree(i, x, x);
-        // hpos can be changed during positionTree:
-        x = findRightMost(i) + boxWidth;  // Start for next tree
+        // Var hpos can be changed during positionTree. Set the start for the
+        // next tree.
+        x = findRightMost(i) + boxWidth;
       }
     }
   };
 
+  /**
+   * Position the complete tree under this parent.
+   */
   positionTree = function (p) {
-    // Position the complete tree under this parent.
     var h, v, s, o, i, n, w, q, r, us, uo, x, maxx, minx, max2, x1, x2, y, hdl, vdl, l, r, t;
 
     debugOut("positionTree(" + nodes[p].txt + ", " + nodes[p].hpos + ", " + nodes[p].vpos + ")");
-    // p has a position already. Position 'l', 'r' and 'u' sibs:
+    // Var p has a position already. Position 'l', 'r' and 'u' sibs:
 
-    // Positioning all 'l' sibs:
+    // Positioning all 'l' sibs.
     for (v = 0; v < nodes[p].lsib.length; v++) {
       s = nodes[p].lsib[v];
       debugOut("New lsib: " + nodes[s].txt + " under " + nodes[p].txt);
-      // New lsib, so the downline crosses all the way down. Make room first:
+      // New lsib, so the downline crosses all the way down. Make room first.
       y = getLowestBox(p, "l") + boxHeight + vSpace;
       // Commented out this function because it added an unwanted spacing to all
       // left nodes.
@@ -1079,7 +1124,7 @@ function orgChart() {
             hShiftTree(p, w);
           } else {
             if (!nodeUnderParent(o, q)) {
-              hShiftTreeAndRBrothers(q, w);  // ! 2*w, dd 2013-10-21
+              hShiftTreeAndRBrothers(q, w);
             } else {
               debugOut("Same parent, do not shift");
             }
@@ -1093,7 +1138,7 @@ function orgChart() {
       positionTree(s);
     }
 
-    // Positioning all rsibs:
+    // Positioning all rsibs.
     for (v = 0; v < nodes[p].rsib.length; v++) {
       s = nodes[p].rsib[v];
       debugOut("New rsib: " + nodes[s].txt + " under " + nodes[p].txt);
@@ -1129,11 +1174,12 @@ function orgChart() {
               if (!nodeUnderParent(o, q)) {
                 hShiftTreeAndRBrothers(q, boxWidth + hSpace - h);
               } else {
-                // Shift parent if overlap with lsib of our parent
+                // Shift parent if overlap with lsib of our parent.
                 debugOut("Same parent, do not shift");
               }
             } else {
-              // Shift the common parent (if any) to the right, and the uppermost parent of the existing o node back to the left:
+              // Shift the common parent (if any) to the right, and the
+              // uppermost parent of the existing o node back to the left.
               us = getRootNode(s);
               uo = getRootNode(o);
               w = nodes[o].hpos - nodes[s].hpos + boxWidth + hSpace;
@@ -1159,11 +1205,11 @@ function orgChart() {
       positionTree(s);
     }
 
-    // Make room for the downline (if necessary):
+    // Make room for the downline (if necessary).
     v = getEndOfDownline(p);
     if (v > 0) {
       debugOut("Make room for the downline, from '" + nodes[p].txt + "' (" + (nodes[p].hpos + boxWidth / 2) + ", " + (nodes[p].vpos + boxHeight) + ") to (" + (nodes[p].hpos + boxWidth / 2) + ", " + v + ")");
-      // Check 'l' sibs first
+      // Check 'l' sibs first.
       if (nodes[p].lsib.length > 0) {
         maxx = -1;
         for (h = 0; h < nodes[p].lsib.length; h++) {
@@ -1174,7 +1220,7 @@ function orgChart() {
         if (w > 0) {
           debugOut("Make room -> Shift Tree and rsibs over " + w);
           nodes[p].hpos += w;
-          // Shift rsibs only if necessary:
+          // Shift rsibs only if necessary.
           for (h = 0; h < nodes[p].rsib.length; h++) {
             o = findLeftMost(nodes[p].rsib[h], v);
             if (o.hpos <= nodes[p].hpos + boxWidth / 2) {
@@ -1184,7 +1230,7 @@ function orgChart() {
         }
       }
 
-      // Check 'r' sibs now
+      // Check 'r' sibs now.
       if (nodes[p].rsib.length > 0) {
         minx = 999999;
         for (h = 0; h < nodes[p].rsib.length; h++) {
@@ -1201,12 +1247,13 @@ function orgChart() {
       }
     }
 
-    // 'u' sibs:
+    // Position all 'u' sibs.
     v = getLowestBox(p, "lr") + boxHeight + vSpace;
     n = nodes[p].usib.length;
 
     if (n > 0) {
-      // If there is a left or right subtree, the starting position is on the right, the left or in between them:
+      // If there is a left or right subtree, the starting position is on the
+      // right, the left or in between them.
       maxx = 0;
       if (nodes[p].lsib.length > 0) {
         for (i = 0; i < nodes[p].lsib.length; i++) {
@@ -1217,7 +1264,7 @@ function orgChart() {
         maxx += boxWidth;
       }
 
-      // Position the root right from the left trees:
+      // Position the root right from the left trees.
       // If there are right trees, spacing differs!
       if (nodes[p].rsib.length > 0) {
         w = maxx + hSpace / 2 - boxWidth / 2 - nodes[p].hpos;
@@ -1229,7 +1276,7 @@ function orgChart() {
         nodes[p].hpos += w;
       }
 
-      // If right trees, shift the to the right of the (repositioned) root node:
+      // If right trees, shift the to the right of the (repositioned) root node.
       for (i = 0; i < nodes[p].rsib.length; i++) {
         x = findLeftMost(nodes[p].rsib[i], v);
         w = nodes[p].hpos + boxWidth / 2 + hShift / 2 - x;
@@ -1240,7 +1287,8 @@ function orgChart() {
         }
       }
 
-      // If there are multiple usib nodes, try to place them under the left tree, centering under the parent:
+      // If there are multiple usib nodes, try to place them under the left
+      // tree, centering under the parent.
       x1 = nodes[p].hpos;
       x2 = nodes[p].hpos;
       if (n >= 2 && x1 > 0) {
@@ -1255,8 +1303,9 @@ function orgChart() {
           x1 = x2;
         }
         if (h >= 0 && nodes[h].hpos + boxWidth + hSpace < x1) {
-          x1 = nodes[h].hpos + boxWidth + hSpace;        // minimum x
-          x2 = x2 + boxWidth / 2 - (n * boxWidth + (n - 1) * hSpace) / 2;  // wanted
+          // Minimum x.
+          x1 = nodes[h].hpos + boxWidth + hSpace;
+          x2 = x2 + boxWidth / 2 - (n * boxWidth + (n - 1) * hSpace) / 2;
           if (x1 > x2) {
             x2 = x1;
           } else {
@@ -1295,7 +1344,7 @@ function orgChart() {
           if (o >= 0) {
             debugOut("New usib '" + nodes[s].txt + " at (" + nodes[s].hpos + ", " + nodes[s].vpos + ")' has overlap with existing node '" + nodes[o].txt + "' at (" + nodes[o].hpos + ", " + nodes[o].vpos + ")");
             w = nodes[o].hpos - nodes[s].hpos + boxWidth + hSpace;
-            // Find the highest node, not in the path of the found 'o' node:
+            // Find the highest node, not in the path of the found 'o' node.
             us = s;
             while (nodes[us].parent != '' && !nodeUnderParent(o, nodes[us].parentix)) {
               us = nodes[us].parentix;
@@ -1316,8 +1365,10 @@ function orgChart() {
     reposParentsRec(p);
   };
 
+  /**
+   * All parents with usibs are repositioned (start at the lowest level!).
+   */
   reposParents = function () {
-    // All parents with usibs are repositioned (start at the lowest level!)
     var i;
 
     debugOut("reposParents()");
@@ -1338,7 +1389,7 @@ function orgChart() {
 
     hpos = nodes[p].hpos;
 
-    // The sibslings first:
+    // The siblings first.
     for (s = 0; s < nodes[p].usib.length; s++) {
       reposParentsRec(nodes[p].usib[s]);
     }
@@ -1349,12 +1400,13 @@ function orgChart() {
       reposParentsRec(nodes[p].rsib[s]);
     }
 
-    // If this is a parent with two or more usibs, reposition it:
-    // (Repos over 1 u sib too, just correct it if necessary)
-    // Except if this is a sib, without room to move, limit the room to move.
-    // Of course a r-sib of this sib can cause an overlap too.
-    // Exception: if this is a node with only one usub, we need to position right above
-    // the usib. If necessary, we need to move the complete parent tree.
+    // If this is a parent with two or more usibs, reposition it (Repos over 1
+    // usib too, just correct it if necessary).
+    // Except if this is a sib without room to move, limit the room to move.
+    // Of course a rsib of this sib can cause an overlap too.
+    // Exception: if this is a node with only one usub, we need to position
+    // right above the usib. If necessary, we need to move the complete parent
+    // tree.
     h = nodes[p].usib.length;
     if (h >= 1) {
       debugOut("repos " + nodes[p].txt);
@@ -1393,7 +1445,7 @@ function orgChart() {
         debugOut("Need: " + (nodes[nodes[p].usib[0]].hpos - nodes[p].hpos) + ", room to move: " + w + " (reset)");
         w = nodes[nodes[p].usib[0]].hpos - nodes[p].hpos;
       }
-      // Check for a crossing with a rsib connection line:
+      // Check for a crossing with a rsib connection line.
       maxw = 999999;
       for (q = 0; q < nodes.length; q++) {
         if (nodes[q].vpos === nodes[p].vpos && nodes[q].hpos > nodes[p].hpos) {
@@ -1403,7 +1455,7 @@ function orgChart() {
         }
       }
       if (w > 1) {
-        // Shift this nodes and all 'l' and 'r' sib trees
+        // Shift this nodes and all 'l' and 'r' sib trees.
         nodes[p].hpos += w;
         for (s = 0; s < nodes[p].lsib.length; s++) {
           hShiftTree(nodes[p].lsib[s], w);
@@ -1418,7 +1470,8 @@ function orgChart() {
   };
 
   findRightMost = function (p, maxv) {
-    // return the highest hpos of the given tree, if maxv is specified, vpos must be less than maxv:
+    // Return the highest hpos of the given tree, if maxv is specified, vpos
+    // must be less than maxv.
     var maxx, x, i;
 
     if (maxv === undefined) {
@@ -1431,19 +1484,19 @@ function orgChart() {
       maxx = -1;
     }
 
-    // usib to the right?
+    // Is there a usib to the right?
     for (i = 0; i < nodes[p].usib.length; i++) {
       x = findRightMost(nodes[p].usib[i], maxv);
       maxx = Math.max(x, maxx);
     }
 
-    // Walk along the lsibs:
+    // Walk along the lsibs.
     for (i = 0; i < nodes[p].lsib.length; i++) {
       x = findRightMost(nodes[p].lsib[i], maxv);
       maxx = Math.max(x, maxx);
     }
 
-    // Walk along the rsibs:
+    // Walk along the rsibs.
     for (i = 0; i < nodes[p].rsib.length; i++) {
       x = findRightMost(nodes[p].rsib[i], maxv);
       maxx = Math.max(x, maxx);
@@ -1452,8 +1505,10 @@ function orgChart() {
     return maxx;
   };
 
+  /**
+   * Return the lowest hpos of the given tree.
+   */
   findLeftMost = function (p, maxv) {
-    // return the lowest hpos of the given tree:
     var minx, x, i;
 
     if (maxv === undefined) {
@@ -1466,19 +1521,19 @@ function orgChart() {
       minx = 999999;
     }
 
-    // usib to the left?
+    // Is there a usib to the left?
     if (nodes[p].usib.length > 0) {
       x = findLeftMost(nodes[p].usib[0], maxv);
       minx = Math.min(x, minx);
     }
 
-    // Walk along the lsibs:
+    // Walk along the lsibs.
     for (i = 0; i < nodes[p].lsib.length; i++) {
       x = findLeftMost(nodes[p].lsib[i], maxv);
       minx = Math.min(x, minx);
     }
 
-    // Walk along the rsibs:
+    // Walk along the rsibs.
     for (i = 0; i < nodes[p].rsib.length; i++) {
       x = findLeftMost(nodes[p].rsib[i], maxv);
       minx = Math.min(x, minx);
@@ -1487,9 +1542,11 @@ function orgChart() {
     return minx;
   };
 
+  /**
+   * Search all nodes on vpos 'v', and return the rightmost node on the left,
+   * or the leftmost on the rest, depending on the direction.
+   */
   findNodeOnLine = function (v, h, dir) {
-    // Search all nodes on vpos 'v', and return the rightmost node on the left, or the leftmost on the rest,
-    // depending on the direction.
     var i, fnd, x;
 
     fnd = -1;
@@ -1511,10 +1568,13 @@ function orgChart() {
     return fnd;
   };
 
+  /**
+   * Images are loaded after drawing finished.
+   * After an image has been loaded, this function will be called, which redraws
+   * the nodes with images nodes, have a valid image now and are drawn
+   * incomplete before.
+   */
   drawImageNodes = function () {
-    // Images are loaded after drawing finished.
-    // After an image has been loaded, this function will be called, which redraws the nodes
-    // with images nodes, have a valid image now and are drawn incomplete before.
     var i, ctx;
 
     ctx = theCanvas.getContext("2d");
@@ -1524,12 +1584,10 @@ function orgChart() {
         drawNode(ctx, i);
       }
     }
-  }
+  };
 
   drawNode = function (ctx, i) {
     var ix, gradient, maxrad, imgrad;
-    // Fix blurred lines by adding a half pixel to the x and y.
-    // @TODO: Test with odd integers.
     var x = nodes[i].hpos;
     var y = nodes[i].vpos;
     var width = boxWidth;
@@ -1550,7 +1608,7 @@ function orgChart() {
     var shadowx = nodes[i].shadowOffsetX;
     var shadowy = nodes[i].shadowOffsetY;
 
-    // Draw shadow with gradient first:
+    // Draw shadow with gradient first.
     if (shadowx > 0) {
       x += shadowx;
       y += shadowy;
@@ -1571,12 +1629,12 @@ function orgChart() {
       y -= shadowy;
     }
 
-    // Draw the box:
+    // Draw the box.
     ctx.lineWidth = (bold) ? 2 : 1;
     gradient = ctx.createLinearGradient(x, y, x, y + height);
     gradient.addColorStop(0, '#FFFFFF');
     gradient.addColorStop(0.7, bfcolor);
-    // Change bfcolor to gradient to use a gradient fill.
+    // Change the var bfcolor to gradient to use a gradient fill.
     // @TODO: Add an option for this.
     ctx.fillStyle = bfcolor;
     ctx.strokeStyle = blcolor;
@@ -1594,18 +1652,17 @@ function orgChart() {
     ctx.fill();
     ctx.stroke();
 
-    // Draw the image, if any:
-    // If the image is available, draw.
-    // Mark it incomplete otherwise.
+    // Draw the image, if any. If the image is available, draw. Mark it
+    // incomplete otherwise.
     var xPic, yPic, maxx, maxy;
     if (img) {
-      // Get all positions and sizes, even if no image loaded yet:
+      // Get all positions and sizes, even if no image loaded yet.
       if (img.width > 0) {
         maxx = img.width;
         maxy = img.height;
 
-        // Resize if image too height:
-        // If the imgrad is less than the linewidth of the box, we need to draw inside the box:
+        // Resize if image too height. If the imgrad is less than the linewidth
+        // of the box, we need to draw inside the box.
         imgrad = 0.414 * (toprad + botrad);
         if (imgrad < 1) imgrad = 1;
 
@@ -1614,7 +1671,7 @@ function orgChart() {
           maxy = height - imgrad;
         }
 
-        // Resize if image too width, even after previous resize:
+        // Resize if image too width, even after previous resize.
         maxrad = toprad;
         if (botrad > maxrad) maxrad = botrad;
         imgrad = 0.414 * maxrad;
@@ -1634,12 +1691,12 @@ function orgChart() {
         maxx = maxy;
       }
 
-      // Horizontal offset:
+      // Horizontal offset.
       xPic = imgrad;
       if (imgalign == 'c') xPic = (width - 2 * imgrad - maxx) / 2 + imgrad;
       if (imgalign == 'r') xPic = width - maxx - imgrad;
 
-      // Vertical offset:
+      // Vertical offset.
       yPic = 0.414 * toprad + 1;
       if (imgvalign == 'm') yPic = (height - maxy) / 2;
       if (imgvalign == 'b') yPic = height - maxy - (0.414 * botrad) - 1;
@@ -1648,7 +1705,7 @@ function orgChart() {
         ctx.drawImage(img, x + xPic, y + yPic, maxx, maxy);
         nodes[i].imgDrawn = 1;
       } else {
-        // Draw an image-not-found picture
+        // Draw an image-not-found picture.
         if (maxy > 0) {
           ctx.beginPath();
           ctx.rect(x + xPic, y + yPic, maxx, maxy);
@@ -1673,8 +1730,8 @@ function orgChart() {
         nodes[i].imgDrawn = 0;
       }
 
-      // Adjust the box size, so the text will be placed next to the image:
-      // Find the biggest rectangle for the text:
+      // Adjust the box size, so the text will be placed next to the image.
+      // Find the biggest rectangle for the text.
       if (imgalign == 'l') {
         if (imgvalign == 't') {
           if ((width - maxx) * height > width * (height - maxy)) {
@@ -1738,24 +1795,22 @@ function orgChart() {
       }
     }
 
-    // Draw text, break the string on spaces, and \n sequences:
+    // Draw text, break the string on spaces, and [br] sequences.
     // Note: excanvas does not clip text. We need to do it ourselves.
-    //ctx.save();
-    //ctx.clip(); will clip on "image-not-found" now
-
-    var tlines = [];  // Split text in multiple lines if it doesn't fit
+    // Split text in multiple lines if it doesn't fit.
+    var tlines = [];
     var n = 0;
     var t1;
     var nl;
     txt = cleanText(txt);
     while (txt.length > 0 && n < maxLoop) {
       t1 = txt;
-      // Split on [br] first
+      // Split on [br] first.
       nl = t1.indexOf("[br]");
       if (nl >= 0) {
         t1 = t1.substr(0, nl);
       }
-      // Remove words until the string fits:
+      // Remove words until the string fits.
       ix = t1.lastIndexOf(" ");
       while (ctx.measureText(t1).width > width - 16 && ix > 0) {
         t1 = t1.substr(0, ix);
@@ -1765,13 +1820,14 @@ function orgChart() {
       n++;
       if (t1.length < txt.length) {
         txt = txt.substr(t1.length);
-        if (nl >= 0) txt = txt.substr(4);  // Remove [br] from the text.
+        // Remove [br] from the text.
+        if (nl >= 0) txt = txt.substr(4);
       } else {
         txt = "";
       }
     }
 
-    // IE does not clip text, so we clip it here:
+    // IE does not clip text, so we clip it here.
     if (fsize * n > height) {
       n = Math.floor(height / fsize);
     }
@@ -1779,7 +1835,8 @@ function orgChart() {
       debugOut("No text displayed on node " + tlines[0] + " as it doesn't fit");
     }
 
-    // The font syntax is: [style] <size> <fontname>. <size> <style> <fontname> does not work! So reformat here:
+    // The font syntax is: [style] <size> <fontname>. <size> <style> <fontname>
+    // does not work! So reformat here.
     var style = '';
     font = font.toLowerCase();
     ix = font.indexOf("bold ");
@@ -1814,21 +1871,19 @@ function orgChart() {
   };
 
   drawConLines = function (ctx) {
-    // Draw all connection lines.
-    // We cannot simply draw all lines, over and over again, as the color will change.
-    // Therefore we draw all lines separate, and only once.
+    // Draw all connection lines. We cannot simply draw all lines, over and over
+    // again, as the color will change. Therefore we draw all lines separate,
+    // and only once.
     var i, f, l, r, v, lastOfLine, lastKey, lastKeyPrevRow, lastPrevRow, rows, row, hpos, vpos, f_hpos, f_vpos, lpr_hpos, lpr_vpos;
 
-    // Set lineWidth to 2px to retain its color.
     ctx.lineWidth = 1;
     ctx.strokeStyle = lineColor;
     ctx.beginPath();
     for (i = 0; i < nodes.length; i++) {
-      // Fix blurred lines by adding a half pixel.
       hpos = nodes[i].hpos;
       vpos = nodes[i].vpos;
 
-      // Top and left lines of siblings
+      // Top and left lines of siblings.
       if (nodes[i].parentix >= 0) {
         if (nodes[i].contype === 'u') {
           ctx.moveTo(hpos + boxWidth / 2, vpos);
@@ -1844,14 +1899,14 @@ function orgChart() {
         }
       }
 
-      // Downline if any siblings:
+      // Downline if any siblings.
       v = getEndOfDownline(i);
       if (v >= 0) {
         ctx.moveTo(hpos + boxWidth / 2, vpos + boxHeight);
         ctx.lineTo(hpos + boxWidth / 2, v);
       }
 
-      // Horizontal line above multiple usibs:
+      // Horizontal line above multiple usibs.
       if (nodes[i].usib.length > 1) {
         f = nodes[i].usib[0];
         l = nodes[i].usib[nodes[i].usib.length - 1];
@@ -1860,7 +1915,6 @@ function orgChart() {
           lastOfLine = nodes[i].usib[usibsPerLine - 1];
         }
 
-        // Fix blurred lines by adding a half pixel.
         f_hpos = nodes[f].hpos;
         f_vpos = nodes[f].vpos;
 
@@ -1897,8 +1951,8 @@ function orgChart() {
                 lpr_hpos = nodes[lastPrevRow].hpos;
                 lpr_vpos = nodes[lastPrevRow].vpos;
 
-                // Draw a line from the last usib of the previous row to the first
-                // of the current row.
+                // Draw a line from the last usib of the previous row to the
+                // first of the current row.
                 ctx.moveTo(lpr_hpos + boxWidth / 2, lpr_vpos - vSpace / 2);
                 ctx.lineTo(lpr_hpos + boxWidth + hSpace / 2, lpr_vpos - vSpace / 2);
                 ctx.moveTo(lpr_hpos + boxWidth + hSpace / 2, lpr_vpos - vSpace / 2);
@@ -1907,19 +1961,15 @@ function orgChart() {
                 ctx.lineTo(f_hpos + boxWidth / 2, f_vpos + (vSpace + boxHeight) * row - vSpace / 2);
               }
 
-              // Draw the line from:
-              // First usib x: nodes[f].hpos + boxWidth /2
-              // First usib y: nodes[f].vpos + (vSpace + boxHeight) * row - vSpace / 2
+              // Draw the line from first usib x to first usib y.
               ctx.moveTo(f_hpos + boxWidth / 2, f_vpos + (vSpace + boxHeight) * row - vSpace / 2);
-              // Draw the line to:
-              // Last usib x: nodes[lastOfLine].hpos + boxWidth / 2
-              // First usib y: nodes[f].vpos + (vSpace + boxHeight) * row - vSpace / 2
+              // Draw the line from last usib x to first usib y.
               ctx.lineTo(nodes[lastOfLine].hpos + boxWidth / 2, f_vpos + (vSpace + boxHeight) * row - vSpace / 2);
             }
           }
         }
       }
-      // Horizontal line above a single 'u' sib, if not aligned:
+      // Horizontal line above a single 'u' sib, if not aligned.
       if (nodes[i].usib.length == 1) {
         f = nodes[i].usib[0];
 
@@ -1933,13 +1983,14 @@ function orgChart() {
   getEndOfDownline = function (p) {
     var f, l, r;
 
-    // if this node has u-sibs, the endpoint can be found from the vpos of the first u-sib:
+    // If this node has u-sibs, the endpoint can be found from the vpos of the
+    // first u-sib.
     if (nodes[p].usib.length > 0) {
       f = nodes[p].usib[0];
       return nodes[f].vpos - vSpace / 2;
     }
 
-    // Find the lowest 'l' or 'r' sib:
+    // Find the lowest 'l' or 'r' sib.
     l = nodes[p].lsib.length;
     r = nodes[p].rsib.length;
     f = -1;
@@ -2014,7 +2065,6 @@ function orgChart() {
 
   debugOut = function (t) {
     if (debug > 0) {
-      //document.write("<font color='red'>OrgChart.js: <b>" + t + "</b></font><br>");
       console.log(t);
     }
   };
@@ -2022,7 +2072,7 @@ function orgChart() {
   cleanText = function (tin) {
     var i;
 
-    // Remove leading spaces:
+    // Remove leading spaces.
     i = 0;
     while (tin.charAt(i) === ' ' || tin.charAt(i) === '\t') {
       i++;
@@ -2031,7 +2081,7 @@ function orgChart() {
       tin = tin.substr(i);
     }
 
-    // Remove trailing spaces:
+    // Remove trailing spaces.
     i = tin.length;
     while (i > 0 && (tin.charAt(i - 1) === ' ' || tin.charAt(i - 1) === '\t')) {
       i--;
@@ -2040,7 +2090,7 @@ function orgChart() {
       tin = tin.substr(0, i);
     }
 
-    // Implode double spaces and tabs etc:
+    // Implode double spaces and tabs etc.
     return tin.replace(/[ \t]{2,}/g, " ");
   };
 
@@ -2051,9 +2101,11 @@ function orgChart() {
     }
   };
 
+  /**
+   * Check all nodes in this tree to overlap another box already placed.
+   * Return the index, or -1.
+   */
   overlapBoxInTree = function (p) {
-    // Check all nodes in this tree to overlap another box already placed:
-    // Return the index, or -1
     var s, r, i, x, y;
 
     if (nodes[p].hpos < 0) {
@@ -2138,21 +2190,23 @@ function orgChart() {
     return p;
   };
 
+  /**
+   * Walk to the top of the tree, and return the first 'u' node found.
+   * If none, return the root node.
+   */
   getUParent = function (n) {
-    // Walk to the top of the tree, and return the first 'u' node found.
-    // If none, return the root node.
     while (n >= 0) {
       if (nodes[n].contype === 'u' || nodes[n].parent === '') {
         return n;
       }
       n = nodes[n].parentix;
     }
-    // Not reached
+    // Not reached.
     return -1;
   };
 
   nodeUnderParent = function (n, p) {
-    // Return 1 if node n is part of the p tree:
+    // Return 1 if node n is part of the p tree.
     while (n >= 0) {
       if (n === p) {
         return 1;
@@ -2196,14 +2250,16 @@ function orgChart() {
     return curtop;
   };
 
+  /**
+   * All l-sib trees may not overlap the downline, up to the point vpos.
+   * Shift the parent and all r-sibs to the right.
+   */
   makeRoomForDownline = function (p, v) {
-    // Alle l-sib trees may not overlap the downline, up to the point vpos.
-    // Shift the parent and all r-sibs to the right
     var maxx, h, x, w, minx;
 
     if (v > 0) {
       debugOut("makeRoomForDownline " + nodes[p].txt + " at hpos " + nodes[p].hpos + ", up to vpos " + v);
-      // Check 'l' sibs first
+      // Check 'l' sibs first.
       if (nodes[p].lsib.length > 0) {
         maxx = -1;
         for (h = 0; h < nodes[p].lsib.length; h++) {
@@ -2219,12 +2275,12 @@ function orgChart() {
         }
       }
     }
-  }
+  };
 
   centerOnCanvas = function (width) {
     var i, max, min, w;
 
-    // Find the left and rightmost nodes:
+    // Find the left and rightmost nodes.
     max = -1;
     min = 999999;
     for (i = 0; i < nodes.length; i++) {
@@ -2241,12 +2297,12 @@ function orgChart() {
     for (i = 0; i < nodes.length; i++) {
       nodes[i].hpos += w;
     }
-  }
+  };
 
   leftOnCanvas = function (width) {
     var i, max, min, w;
 
-    // Find the leftmost node:
+    // Find the leftmost node.
     min = 999999;
     for (i = 0; i < nodes.length; i++) {
       if (nodes[i].hpos < min) {
@@ -2262,4 +2318,4 @@ function orgChart() {
     }
   }
 
-} // orgChart
+}
