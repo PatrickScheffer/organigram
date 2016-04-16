@@ -12,8 +12,12 @@
 
       /**
        * IE8 fix.
+       *
        * @param {Object} obj
-       * @returns {Array}
+       *   Object to get the keys from.
+       *
+       * @return {Array}
+       *   Array with object keys.
        */
       if (!Object.keys) {
         Object.keys = function (obj) {
