@@ -1,5 +1,3 @@
-/* exported orgChart */
-
 /**
  * @file
  * Contains OrgChart Library v1.14.
@@ -123,6 +121,8 @@
  * 2016-04-13 Fixed: Cursor stays pointer when moving to fast off canvas.
  * 2016-04-16 Fixed: Added docs everywhere and removed unused vars and functions.
  */
+
+/* exported orgChart */
 
 // So non-IE won't freak out.
 var G_vmlCanvasManager;
