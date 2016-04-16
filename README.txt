@@ -62,7 +62,7 @@ PLUGINS
    Provides HTML5 canvas support for Internet Explorer < 9.
 
    Steps:
-   1. Download here: https://github.com/arv/ExplorerCanvas/archive/aa989ea9d9bac748638f7c66b0fc88e619715da6.zip
+   1. Download here: https://github.com/arv/ExplorerCanvas/archive/aa989ea.zip
    2. Place the contents of this zip in your libraries folder. See the readme of
       the libraries module for more information about this.
    3. Rename the extracted folder to 'excanvas' so the path to the javascript
@@ -72,7 +72,8 @@ PLUGINS
    Adds a color picker to fields like border color and background color.
 
    Steps to enable this plugin:
-   1. Download here: https://github.com/evoluteur/colorpicker/archive/233e15e4368b0d1eb30f8036a1f5970f09e8ed9e.zip
+   1. Download here:
+      https://github.com/evoluteur/colorpicker/archive/233e15e.zip
    2. Place the contents of this zip in your libraries folder. See the readme of
       the libraries module for more information about this.
    3. Rename the extracted folder to 'colorpicker' so the path to the

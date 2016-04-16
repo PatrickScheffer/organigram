@@ -1,3 +1,5 @@
+/* exported orgChart */
+
 /**
  * @file
  * Contains OrgChart Library v1.14.
@@ -126,7 +128,7 @@
 var G_vmlCanvasManager;
 
 /**
- * Class orgChart.
+ * Initialize the orgChart.
  */
 function orgChart() {
 
