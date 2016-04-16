@@ -413,7 +413,7 @@ function orgChart() {
     }
 
     var n = new Node(id, parent, ctype, text, bold, url, linecolor, fillcolor, textcolor, imgalign, imgvalign);
-    if (img !== undefined) {
+    if (img !== undefined && img !== '') {
       n.img = new Image();
       n.img.src = img;
       n.img.onload = function () {
@@ -1692,7 +1692,7 @@ function orgChart() {
     }
 
     // Draw the box.
-    ctx.lineWidth = (bold) ? 2 : 1;
+    ctx.lineWidth = (bold == 1) ? 2 : 1;
     gradient = ctx.createLinearGradient(x, y, x, y + height);
     gradient.addColorStop(0, '#FFFFFF');
     gradient.addColorStop(0.7, bfcolor);

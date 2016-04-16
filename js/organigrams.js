@@ -10,12 +10,12 @@
 
       var redrawOnResize = {};
 
+      /**
+       * IE8 fix.
+       * @param {Object} obj
+       * @returns {Array}
+       */
       if (!Object.keys) {
-        /**
-         * IE8 fix.
-         * @param {Object} obj
-         * @returns {Array}
-         */
         Object.keys = function (obj) {
           var keys = [];
 
@@ -85,7 +85,8 @@
        * @return {Array} - Array with node objects.
        */
       function organigramExtractNodes(organigram_id) {
-        var i, organigram_items;
+        var i;
+        var organigram_items;
         var nodes = [];
         var attributes = [
           'id',
@@ -221,12 +222,12 @@
                 organigram_data['nodes'][i].parent,
                 organigram_data['nodes'][i].position,
                 organigram_data['nodes'][i].text,
-                organigram_data['nodes'][i].bold == 0 ? undefined : 1,
+                organigram_data['nodes'][i].bold,
                 organigram_data['nodes'][i].url,
                 organigram_data['nodes'][i].border_color,
                 organigram_data['nodes'][i].background_color,
                 organigram_data['nodes'][i].font_color,
-                organigram_data['nodes'][i].image_url.length > 0 ? organigram_data['nodes'][i].image_url : undefined,
+                organigram_data['nodes'][i].image_url.length > 0 ? organigram_data['nodes'][i].image_url : '',
                 organigram_data['nodes'][i].image_alignment
               );
             }
